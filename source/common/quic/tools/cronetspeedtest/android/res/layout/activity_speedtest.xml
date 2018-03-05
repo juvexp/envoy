@@ -1,0 +1,102 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:orientation="vertical">
+
+  <EditText
+     android:id="@+id/host_field"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:inputType="text"
+     android:singleLine="true"
+     android:hint="Enter hostname without port"/>
+  <CheckBox
+      android:id="@+id/cronet_enabled"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:enabled="true"
+      android:checked="true"
+      android:text="Cronet Enabled"/>
+  <RadioGroup
+      android:id="@+id/cronet_protocol"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Cronet Protocol">
+    <RadioButton
+        android:id="@+id/cronet_protocol_h11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Http 1.1"/>
+    <RadioButton
+        android:id="@+id/cronet_protocol_h2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Http 2"/>
+    <RadioButton
+        android:id="@+id/cronet_protocol_quic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="QUIC"
+        android:checked="true"/>
+  </RadioGroup>
+
+  <Button
+      android:id="@+id/upload_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:enabled="true"
+      android:text="Upload"/>
+  <Button
+      android:id="@+id/download_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:enabled="true"
+      android:text="Download"/>
+
+  <ProgressBar
+      android:id="@+id/progress_bar"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:progress="0"/>
+
+
+  <TextView
+      android:id="@+id/bitrate_indication"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:inputType="none"/>
+
+  <Button
+      android:id="@+id/cancel_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:enabled="false"
+      android:text="Cancel"/>
+
+  <ScrollView
+      android:id="@+id/transfer_details_scroll_view"
+      android:layout_width="match_parent"
+      android:layout_height="250dp"
+      android:layout_gravity="center">
+    <TextView
+        android:id="@+id/transfer_details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceSmall"/>
+  </ScrollView>
+
+</LinearLayout>

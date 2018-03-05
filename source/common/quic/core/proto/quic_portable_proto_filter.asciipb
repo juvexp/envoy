@@ -1,0 +1,5 @@
+# QUIC portable proto configuration.
+# Encodes a proto2.contrib.portable.ConfigProto in text format (go/textformat).
+allowed_file: "gfe/quic/core/proto/cached_network_parameters.proto"
+allowed_file: "gfe/quic/core/proto/crypto_server_config.proto"
+allowed_file: "gfe/quic/core/proto/source_address_token.proto"

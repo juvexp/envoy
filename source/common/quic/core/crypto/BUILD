@@ -1,0 +1,342 @@
+# Description:
+#   Code for QUIC crypto (see go/quic) which is either shared between
+#   chrome-gfe or to-be-opensourced.
+
+package_group(
+    name = "internal",
+    packages = [
+        "//gfe/cluster_broker/...",
+        "//gfe/gfe2/...",
+        "//source/common/quic/...",
+        "//gfe/test_tools/...",
+        "//net/hostdatapath/common/protocols",
+        "//video/streaming/quic",
+    ],
+)
+
+default_visibility = [":internal"]
+
+package(default_visibility = default_visibility)
+
+envoy_cc_library(
+    name = "crypto_handshake_lib",
+    srcs = [
+        "cert_compressor.cc",
+        "channel_id.cc",
+        "common_cert_set.cc",
+        "crypto_framer.cc",
+        "crypto_handshake.cc",
+        "crypto_handshake_message.cc",
+        "crypto_secret_boxer_google3.cc",
+        "crypto_utils.cc",
+        "curve25519_key_exchange.cc",
+        "p256_key_exchange.cc",
+        "quic_compressed_certs_cache.cc",
+        "quic_crypto_client_config.cc",
+        "quic_crypto_server_config.cc",
+        "quic_tls_adapter.cc",
+        "transport_parameters.cc",
+    ],
+    hdrs = [
+        "cert_compressor.h",
+        "channel_id.h",
+        "common_cert_set.h",
+        "crypto_framer.h",
+        "crypto_handshake.h",
+        "crypto_handshake_message.h",
+        "crypto_message_parser.h",
+        "crypto_secret_boxer.h",
+        "crypto_utils.h",
+        "curve25519_key_exchange.h",
+        "ephemeral_key_source.h",
+        "key_exchange.h",
+        "p256_key_exchange.h",
+        "proof_source.h",
+        "proof_verifier.h",
+        "quic_compressed_certs_cache.h",
+        "quic_crypto_client_config.h",
+        "quic_crypto_server_config.h",
+        "quic_tls_adapter.h",
+        "transport_parameters.h",
+    ],
+    tags = ["pg3"],
+    textual_hdrs = [
+        "common_cert_set_2.c",
+        "common_cert_set_2a.inc",
+        "common_cert_set_2b.inc",
+        "common_cert_set_3.c",
+        "common_cert_set_3a.inc",
+        "common_cert_set_3b.inc",
+    ],
+    visibility = default_visibility + [
+        "//net/grpc/internal/src/core/quic:__pkg__",
+        # For //video/streaming/testing/perf:vstress_client_test.
+        "//video/streaming/testing/perf:__pkg__",
+    ],
+    deps = [
+        ":proof_source",
+        ":quic_encryption_lib",
+        ":quic_random_lib",
+        "//base",
+        "//gfe/gfe2/base:protocol_flags_lib",
+        "//source/common/quic/core:quic_data_lib",
+        "//source/common/quic/core:quic_error_codes_lib",
+        "//source/common/quic/core:quic_packets_lib",
+        "//source/common/quic/core:quic_server_id_lib",
+        "//source/common/quic/core:quic_socket_address_coder_lib",
+        "//source/common/quic/core:quic_time_lib",
+        "//source/common/quic/core:quic_types_lib",
+        "//source/common/quic/core:quic_utils_lib",
+        "//source/common/quic/core:quic_versions_lib",
+        "//source/common/quic/core/crypto/base:hkdf",
+        "//source/common/quic/core/proto:portable_quic_core_proto",
+        "//source/common/quic/platform/api:quic_arraysize_lib",
+        "//source/common/quic/platform/api:quic_bug_tracker_lib",
+        "//source/common/quic/platform/api:quic_clock_lib",
+        "//source/common/quic/platform/api:quic_endian_lib",
+        "//source/common/quic/platform/api:quic_export_lib",
+        "//source/common/quic/platform/api:quic_fallthrough_lib",
+        "//source/common/quic/platform/api:quic_flags_lib",
+        "//source/common/quic/platform/api:quic_hostname_utils_lib",
+        "//source/common/quic/platform/api:quic_logging_lib",
+        "//source/common/quic/platform/api:quic_lru_cache_lib",
+        "//source/common/quic/platform/api:quic_map_util_lib",
+        "//source/common/quic/platform/api:quic_mutex_lib",
+        "//source/common/quic/platform/api:quic_ptr_util_lib",
+        "//source/common/quic/platform/api:quic_ref_counted_lib",
+        "//source/common/quic/platform/api:quic_singleton_lib",
+        "//source/common/quic/platform/api:quic_socket_address_lib",
+        "//source/common/quic/platform/api:quic_str_cat_lib",
+        "//source/common/quic/platform/api:quic_string_lib",
+        "//source/common/quic/platform/api:quic_string_piece_lib",
+        "//source/common/quic/platform/api:quic_text_utils_lib",
+        "//third_party/absl/memory",
+        "//third_party/openssl:crypto",
+        "//third_party/openssl:ssl",
+        "//third_party/zlib:zlibonly",
+    ],
+)
+
+envoy_cc_library(
+    name = "proof_source",
+    srcs = [
+        "proof_source.cc",
+        "quic_crypto_proof.cc",
+    ],
+    hdrs = [
+        "proof_source.h",
+        "quic_crypto_proof.h",
+    ],
+    visibility = default_visibility + [
+        # For //video/streaming/testing/perf:vstress_client_test.
+        "//video/streaming/testing/perf:__pkg__",
+    ],
+    deps = [
+        "//source/common/quic/core:quic_packets_lib",
+        "//source/common/quic/platform/api:quic_export_lib",
+        "//source/common/quic/platform/api:quic_ref_counted_lib",
+        "//source/common/quic/platform/api:quic_socket_address_lib",
+        "//source/common/quic/platform/api:quic_string_lib",
+        "//source/common/quic/platform/api:quic_string_piece_lib",
+    ],
+)
+
+envoy_cc_library(
+    name = "proof_source_google3",
+    srcs = [
+        "proof_source_google3.cc",
+    ],
+    hdrs = [
+        "proof_source_google3.h",
+    ],
+    visibility = default_visibility + [
+        "//net/grpc/internal/src/core/quic:__pkg__",
+        "//security/alia_handshaker/data_plane:__pkg__",
+    ],
+    deps = [
+        ":proof_source",
+        ":quic_encryption_lib",
+        "//base",
+        "//gfe/gfe2/alia:alia_client",
+        "//gfe/gfe2/alia:flags",
+        "//gfe/gfe2/base:data_registry",
+        "//gfe/gfe2/base:flag_varz_utils",
+        "//gfe/gfe2/cloud:cloud_config_module_lib",
+        "//gfe/gfe2/cloud:shared_cloud_config_data_lib",
+        "//gfe/gfe2/config",
+        "//gfe/gfe2/config:gfe_serverstate",
+        "//gfe/gfe2/mentat:mentat_client_lib",
+        "//source/common/quic/platform/api:quic_bug_tracker_lib",
+        "//source/common/quic/platform/api:quic_flags_lib",
+        "//source/common/quic/platform/api:quic_logging_lib",
+        "//source/common/quic/platform/api:quic_mutex_lib",
+        "//source/common/quic/platform/api:quic_ptr_util_lib",
+        "//source/common/quic/platform/api:quic_singleton_lib",
+        "//source/common/quic/platform/api:quic_str_cat_lib",
+        "//source/common/quic/platform/api:quic_string_lib",
+        "//net/httpsconnection:sslcertificate",
+        "//net/httpsconnection:sslconnectionbase",
+        "//net/httpsconnection:sslerror",
+        "//net/util:ipaddress",
+        "//testing/production_stub/public:testvalue",
+        "//third_party/openssl:crypto",
+        "//third_party/openssl:ssl",
+        "//thread",
+        "//util/functional",
+        "//util/functional:callable_once",
+        "//util/sig:sign",
+    ],
+)
+
+envoy_cc_library(
+    name = "ephemeral_key_source_google3",
+    srcs = ["ephemeral_key_source_google3.cc"],
+    hdrs = [
+        "ephemeral_key_source_google3.h",
+    ],
+    deps = [
+        ":crypto_handshake_lib",
+        ":quic_encryption_lib",
+        "//base",
+        "//source/common/quic/core:quic_time_lib",
+        "//source/common/quic/platform/api:quic_string_lib",
+        "//thread",
+    ],
+)
+
+envoy_cc_library(
+    name = "proof_verifier_google3",
+    srcs = [
+        "proof_verifier_google3.cc",
+    ],
+    hdrs = [
+        "proof_verifier_google3.h",
+    ],
+    visibility = default_visibility + [
+        "//net/bandaid/internetto/wtrace/agent:__pkg__",
+        "//net/grpc/internal/src/core/quic:__pkg__",
+        "//net/grpc/internal/src/core/quic/test_tools:__pkg__",
+        "//net/hostdatapath/testing/quic_fetcher:__pkg__",
+        "//security/alia_handshaker/data_plane:__pkg__",
+    ],
+    deps = [
+        ":crypto_handshake_lib",
+        ":quic_encryption_lib",
+        "//base",
+        "//source/common/quic/platform/api:quic_bug_tracker_lib",
+        "//source/common/quic/platform/api:quic_logging_lib",
+        "//source/common/quic/platform/api:quic_string_lib",
+        "//net/httpsconnection:sslconnectionbase",
+        "//net/httpsconnection:sslerror",
+        "//third_party/openssl:crypto",
+        "//util/sig:sign",
+        "//util/task:status",
+    ],
+)
+
+envoy_cc_library(
+    name = "quic_random_lib",
+    srcs = [
+        "quic_random.cc",
+    ],
+    hdrs = [
+        "quic_random.h",
+    ],
+    visibility = default_visibility + [
+        "//net/grpc/internal/src/core/quic:__pkg__",
+    ],
+    deps = [
+        "//base",
+        "//source/common/quic/platform/api:quic_bug_tracker_lib",
+        "//source/common/quic/platform/api:quic_export_lib",
+        "//source/common/quic/platform/api:quic_singleton_lib",
+        "//third_party/openssl:crypto",
+    ],
+)
+
+envoy_cc_library(
+    name = "quic_encryption_lib",
+    srcs = [
+        "aead_base_decrypter.cc",
+        "aead_base_encrypter.cc",
+        "aes_128_gcm_12_decrypter.cc",
+        "aes_128_gcm_12_encrypter.cc",
+        "aes_128_gcm_decrypter.cc",
+        "aes_128_gcm_encrypter.cc",
+        "aes_256_gcm_decrypter.cc",
+        "aes_256_gcm_encrypter.cc",
+        "chacha20_poly1305_decrypter.cc",
+        "chacha20_poly1305_encrypter.cc",
+        "chacha20_poly1305_tls_decrypter.cc",
+        "chacha20_poly1305_tls_encrypter.cc",
+        "null_decrypter.cc",
+        "null_encrypter.cc",
+        "quic_decrypter.cc",
+        "quic_encrypter.cc",
+        "scoped_evp_aead_ctx.cc",
+    ],
+    hdrs = [
+        "aead_base_decrypter.h",
+        "aead_base_encrypter.h",
+        "aes_128_gcm_12_decrypter.h",
+        "aes_128_gcm_12_encrypter.h",
+        "aes_128_gcm_decrypter.h",
+        "aes_128_gcm_encrypter.h",
+        "aes_256_gcm_decrypter.h",
+        "aes_256_gcm_encrypter.h",
+        "chacha20_poly1305_decrypter.h",
+        "chacha20_poly1305_encrypter.h",
+        "chacha20_poly1305_tls_decrypter.h",
+        "chacha20_poly1305_tls_encrypter.h",
+        "crypto_protocol.h",
+        "null_decrypter.h",
+        "null_encrypter.h",
+        "quic_decrypter.h",
+        "quic_encrypter.h",
+        "scoped_evp_aead_ctx.h",
+    ],
+    visibility = default_visibility + [
+        "//security/alia_handshaker/data_plane:__subpackages__",
+    ],
+    deps = [
+        "//base",
+        "//source/common/quic/core:quic_data_lib",
+        "//source/common/quic/core:quic_packets_lib",
+        "//source/common/quic/core:quic_tag_lib",
+        "//source/common/quic/core:quic_types_lib",
+        "//source/common/quic/core:quic_utils_lib",
+        "//source/common/quic/core/crypto/base:hkdf",
+        "//source/common/quic/platform/api:quic_aligned_lib",
+        "//source/common/quic/platform/api:quic_arraysize_lib",
+        "//source/common/quic/platform/api:quic_bug_tracker_lib",
+        "//source/common/quic/platform/api:quic_export_lib",
+        "//source/common/quic/platform/api:quic_flag_utils_lib",
+        "//source/common/quic/platform/api:quic_flags_lib",
+        "//source/common/quic/platform/api:quic_logging_lib",
+        "//source/common/quic/platform/api:quic_string_lib",
+        "//source/common/quic/platform/api:quic_string_piece_lib",
+        "//third_party/openssl:crypto",
+        "//third_party/openssl:ssl",
+    ],
+)
+
+envoy_cc_binary(
+    name = "crypto_message_printer",
+    srcs = [
+        "crypto_message_printer_bin.cc",
+    ],
+    deps = [
+        ":crypto_handshake_lib",
+        "//base",
+        "//source/common/quic/core:quic_utils_lib",
+        "//source/common/quic/platform/api:quic_flags_lib",
+        "//source/common/quic/platform/api:quic_string_lib",
+        "//source/common/quic/platform/api:quic_text_utils_lib",
+    ],
+)
+
+filegroup(
+    name = "exported_header_files",
+    srcs = glob(["**/*.h"]),
+    visibility = ["//gfe/tools/chromium:__pkg__"],
+)

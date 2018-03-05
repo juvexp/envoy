@@ -1,0 +1,121 @@
+// See //google3/uploader/library/proto/customer_config.proto
+
+scotty_config main = {
+  customer = [
+    // This is a sample config for single post uploads using blobstore dropzone.
+    {
+      name = 'upload_test_blobstore'
+
+      // Disassemble multipart bodies.
+      enable_multipart_parsing_for_single_post_post = true
+
+      // Allow non-SSL requests
+      reject_non_ssl_requests = false
+
+      // This specifies where uploads will be stored (the drop zone).  We drop
+      // the files into a blobstore path. CNS drop zones are also possible but
+      // strongly discouraged.
+      drop_zone = {
+        dev_null = {}
+      }
+
+      // This tells Scotty what to do when it receives an upload.
+      // The SCOTTY_AGENT uses the ScottyAgent interface to get updates on the
+      // request progression, from start of the request to the end of the reply.
+      agent_config = {
+        scotty_agent_info = {
+          service_config = {
+            fallback_address = 'localhost:10001'
+          }
+          support_download = true
+        }
+      }
+
+      transfer_protocol = 1 // HTTP
+    },
+    // This is a sample config for single post uploads for using a CNS dropzone.
+    {
+      name = 'upload_test_cns'
+
+      // Disassemble multipart bodies.
+      enable_multipart_parsing_for_single_post_post = true
+
+      // Allow non-SSL requests
+      reject_non_ssl_requests = false
+
+      // This specifies where uploads will be stored (the drop zone).  We drop
+      // the files into a CNS directory. This is heavily discouraged and we
+      // prefer you use blobstore. See go/scotty-migrate-to-blobstore.
+      drop_zone = {
+        cns = {
+          dir = [
+            '/cns/ph-d/home/apps-upload-dev/test/uploads',
+            '/cns/ie-d/home/apps-upload-dev/test/uploads'
+          ]
+        }
+      }
+
+      // This tells Scotty what to do when it receives an upload.
+      // The SCOTTY_AGENT uses the ScottyAgent interface to get updates on the
+      // request progression, from start of the request to the end of the reply.
+      agent_config = {
+        scotty_agent_info = {
+          service_config = {
+            fallback_address = 'localhost:10001'
+          }
+        }
+      }
+
+      transfer_protocol = 1 // HTTP
+    },
+    // This is a sample config for batch uploads.
+    {
+      name = 'upload_test_batch'
+
+      drop_zone = {
+        cns = {
+          dir = [
+            '/cns/ph-d/home/apps-upload-dev/test/uploads',
+            '/cns/ie-d/home/apps-upload-dev/test/uploads'
+          ]
+        }
+      }
+
+      agent_config = {
+        scotty_batch_agent_info = {
+          scotty_agent_info = {
+            service_config = {
+              fallback_address = 'localhost:10001'
+            }
+          }
+        }
+      }
+
+      transfer_protocol = 1 // HTTP
+    }
+  ]
+
+  // The customer map holds the upload urls for each customer.
+  // This map must be a one-to-one mapping from full url to customer.
+  // It follows the same rules as the gfe service map does.
+  url_customer_map =
+'''
+HOSTSET elided_host = { 'provided.by.GROUP.block' };
+SCOPE any [
+  GROUP any_host [
+    { '*' }
+  ]
+]
+SCOPE any/any_host : elide_host [
+  SERVICE upload_test_blobstore [
+    %elided_host : { '/uploads', '/uploads/*' };
+  ]
+  SERVICE upload_test_cns [
+    %elided_host : { '/cnsuploads', '/cnsuploads/*' };
+  ]
+  SERVICE upload_test_batch [
+    %elided_host : { '/batch', '/batch/*' };
+  ]
+]
+'''
+}
