@@ -28,7 +28,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "spdy_no_op_visitor_lib",
     testonly = 1,
     srcs = ["spdy_no_op_visitor.cc"],
@@ -69,7 +69,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "spdy_test_utils_lib",
     testonly = 1,
     srcs = ["spdy_test_utils.cc"],
@@ -88,7 +88,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "spdy_deframer_visitor_lib",
     testonly = 1,
     srcs = ["spdy_deframer_visitor.cc"],
@@ -111,7 +111,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "spdy_protocol_test_utils_lib",
     testonly = 1,
     srcs = ["spdy_protocol_test_utils.cc"],
@@ -125,7 +125,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "mock_spdy_framer_visitor",
     testonly = 1,
     srcs = [

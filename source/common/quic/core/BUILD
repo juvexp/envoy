@@ -4,7 +4,7 @@
 
 package(default_visibility = [":internal"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "envoy_cc_test_library")
+load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
 load("//tools/build_rules:build_test.bzl", "build_test")
 
 package_group(
@@ -1231,7 +1231,7 @@ envoy_cc_library(
     ],
 )
 
-# This should list envoy_cc_library targets that wouldn't otherwise
+# This should list cc_library targets that wouldn't otherwise
 # be depended upon by a cross-platform test.
 build_test(
     name = "quic_core_pg3_build",

@@ -535,6 +535,16 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   }
   const QuicTime::Delta ping_timeout() { return ping_timeout_; }
   // Used in Chromium, but not internally.
+  // Must only be called before retransmittable_on_wire_alarm_ is set.
+  void set_retransmittable_on_wire_timeout(
+      QuicTime::Delta retransmittable_on_wire_timeout) {
+    DCHECK(!retransmittable_on_wire_alarm_->IsSet());
+    retransmittable_on_wire_timeout_ = retransmittable_on_wire_timeout;
+  }
+  const QuicTime::Delta retransmittable_on_wire_timeout() {
+    return retransmittable_on_wire_timeout_;
+  }
+  // Used in Chromium, but not internally.
   void set_creator_debug_delegate(QuicPacketCreator::DebugDelegate* visitor) {
     packet_generator_.set_debug_delegate(visitor);
   }
@@ -767,6 +777,8 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   void set_per_packet_options(PerPacketOptions* options) {
     per_packet_options_ = options;
   }
+
+  void SetRetransmittableOnWireAlarm();
 
  protected:
   // Calls cancel() on all the alarms owned by this connection.
@@ -1074,6 +1086,9 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   // The timeout for PING.
   QuicTime::Delta ping_timeout_;
 
+  // Timeout for how long the wire can have no retransmittable packets.
+  QuicTime::Delta retransmittable_on_wire_timeout_;
+
   // Arena to store class implementations within the QuicConnection.
   QuicConnectionArena arena_;
 
@@ -1095,6 +1110,9 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   QuicArenaScopedPtr<QuicAlarm> ping_alarm_;
   // An alarm that fires when an MTU probe should be sent.
   QuicArenaScopedPtr<QuicAlarm> mtu_discovery_alarm_;
+  // An alarm that fires when there have been no retransmittable packets on the
+  // wire for some period.
+  QuicArenaScopedPtr<QuicAlarm> retransmittable_on_wire_alarm_;
 
   // Neither visitor is owned by this class.
   QuicConnectionVisitorInterface* visitor_;

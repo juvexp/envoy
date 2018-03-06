@@ -4,7 +4,7 @@ package(default_visibility = ["//source/common/quic/http:gfe_quic"])
 
 # Libraries
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_frame_parts_lib",
     testonly = 1,
     srcs = [
@@ -30,7 +30,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_frame_parts_collector_lib",
     testonly = 1,
     srcs = [
@@ -52,7 +52,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_frame_parts_collector_listener_lib",
     testonly = 1,
     srcs = [

@@ -12,7 +12,7 @@ package_group(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "simulator_lib",
     testonly = 1,
     srcs = [
@@ -69,7 +69,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_endpoint_lib",
     testonly = 1,
     srcs = [

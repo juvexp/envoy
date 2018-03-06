@@ -316,19 +316,12 @@ void QuicSession::OnCanWrite() {
   // streams become pending, WillingAndAbleToWrite will be true, which will
   // cause the connection to request resumption before yielding to other
   // connections.
-  size_t num_writes = write_blocked_streams_.NumBlockedStreams();
-  if (flow_controller_.IsBlocked()) {
-    // If we are connection level flow control blocked, then only allow the
-    // crypto and headers streams to try writing as all other streams will be
-    // blocked.
-    num_writes = 0;
-    if (write_blocked_streams_.crypto_stream_blocked()) {
-      num_writes += 1;
-    }
-    if (write_blocked_streams_.headers_stream_blocked()) {
-      num_writes += 1;
-    }
-  }
+  // If we are connection level flow control blocked, then only allow the
+  // crypto and headers streams to try writing as all other streams will be
+  // blocked.
+  size_t num_writes = flow_controller_.IsBlocked()
+                          ? write_blocked_streams_.NumBlockedSpecialStreams()
+                          : write_blocked_streams_.NumBlockedStreams();
   if (num_writes == 0 && (!use_control_frame_manager() ||
                           !control_frame_manager_.WillingToWrite())) {
     return;
@@ -340,7 +333,7 @@ void QuicSession::OnCanWrite() {
     control_frame_manager_.OnCanWrite();
   }
   for (size_t i = 0; i < num_writes; ++i) {
-    if (!(write_blocked_streams_.HasWriteBlockedCryptoOrHeadersStream() ||
+    if (!(write_blocked_streams_.HasWriteBlockedSpecialStream() ||
           write_blocked_streams_.HasWriteBlockedDataStreams())) {
       // Writing one stream removed another!? Something's broken.
       QUIC_BUG << "WriteBlockedStream is missing";
@@ -380,7 +373,7 @@ bool QuicSession::WillingAndAbleToWrite() const {
   return (use_control_frame_manager() &&
           control_frame_manager_.WillingToWrite()) ||
          !streams_with_pending_retransmission_.empty() ||
-         write_blocked_streams_.HasWriteBlockedCryptoOrHeadersStream() ||
+         write_blocked_streams_.HasWriteBlockedSpecialStream() ||
          (!flow_controller_.IsBlocked() &&
           write_blocked_streams_.HasWriteBlockedDataStreams());
 }
@@ -388,7 +381,7 @@ bool QuicSession::WillingAndAbleToWrite() const {
 bool QuicSession::HasPendingHandshake() const {
   return QuicContainsKey(streams_with_pending_retransmission_,
                          kCryptoStreamId) ||
-         write_blocked_streams_.crypto_stream_blocked();
+         write_blocked_streams_.IsStreamBlocked(kCryptoStreamId);
 }
 
 bool QuicSession::HasOpenDynamicStreams() const {
@@ -994,7 +987,7 @@ void QuicSession::MarkConnectionLevelWriteBlocked(QuicStreamId id) {
 }
 
 bool QuicSession::HasDataToWrite() const {
-  return write_blocked_streams_.HasWriteBlockedCryptoOrHeadersStream() ||
+  return write_blocked_streams_.HasWriteBlockedSpecialStream() ||
          write_blocked_streams_.HasWriteBlockedDataStreams() ||
          connection_->HasQueuedData() ||
          !streams_with_pending_retransmission_.empty() ||

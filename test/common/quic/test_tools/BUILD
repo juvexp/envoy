@@ -32,7 +32,7 @@ package(
     default_visibility = ["//source/common/quic/test_tools:internal"],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "rtt_stats_peer",
     srcs = [
         "rtt_stats_peer.cc",
@@ -47,7 +47,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_client_promised_info_peer",
     srcs = [
         "quic_client_promised_info_peer.cc",
@@ -61,7 +61,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_config_peer",
     srcs = [
         "quic_config_peer.cc",
@@ -76,7 +76,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_crypto_server_config_peer",
     srcs = [
         "quic_crypto_server_config_peer.cc",
@@ -94,7 +94,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_framer_peer",
     srcs = [
         "quic_framer_peer.cc",
@@ -111,7 +111,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_packet_creator_peer",
     srcs = [
         "quic_packet_creator_peer.cc",
@@ -126,7 +126,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_packet_generator_peer",
     srcs = [
         "quic_packet_generator_peer.cc",
@@ -142,7 +142,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_sent_packet_manager_peer",
     srcs = [
         "quic_sent_packet_manager_peer.cc",
@@ -158,7 +158,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_sustained_bandwidth_recorder_peer",
     srcs = [
         "quic_sustained_bandwidth_recorder_peer.cc",
@@ -173,7 +173,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_test_server",
     srcs = [
         "quic_test_server.cc",
@@ -196,7 +196,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_buffered_packet_store_peer",
     srcs = [
         "quic_buffered_packet_store_peer.cc",
@@ -211,7 +211,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_spdy_stream_peer",
     srcs = [
         "quic_spdy_stream_peer.cc",
@@ -225,7 +225,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_session_peer",
     srcs = [
         "quic_session_peer.cc",
@@ -242,7 +242,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_spdy_session_peer",
     srcs = [
         "quic_spdy_session_peer.cc",
@@ -258,7 +258,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_stream_sequencer_buffer_peer",
     srcs = [
         "quic_stream_sequencer_buffer_peer.cc",
@@ -274,7 +274,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_stream_sequencer_peer",
     srcs = [
         "quic_stream_sequencer_peer.cc",
@@ -290,7 +290,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_test_utils",
     srcs = [
         "crypto_test_utils.cc",
@@ -391,7 +391,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "bad_packet_writer_lib",
     srcs = [
         "bad_packet_writer.cc",
@@ -404,7 +404,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "packet_reordering_writer_lib",
     srcs = [
         "packet_reordering_writer.cc",
@@ -417,7 +417,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "packet_dropping_test_writer_lib",
     srcs = [
         "packet_dropping_test_writer.cc",
@@ -438,7 +438,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "limited_mtu_test_writer_lib",
     srcs = [
         "limited_mtu_test_writer.cc",
@@ -453,7 +453,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_test_client_lib",
     srcs = [
         "quic_test_client.cc",
@@ -493,7 +493,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_stream_peer",
     srcs = [
         "quic_stream_peer.cc",
@@ -511,7 +511,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_stream_send_buffer_peer",
     srcs = [
         "quic_stream_send_buffer_peer.cc",
@@ -524,7 +524,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_flow_controller_peer",
     srcs = [
         "quic_flow_controller_peer.cc",
@@ -539,7 +539,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_time_wait_list_manager_peer",
     srcs = [
         "quic_time_wait_list_manager_peer.cc",
@@ -550,7 +550,7 @@ envoy_cc_library(
     deps = ["//source/common/quic/core:quic_time_wait_list_manager_lib"],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "server_thread_lib",
     srcs = [
         "server_thread.cc",
@@ -571,7 +571,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "mock_clock",
     srcs = [
         "mock_clock.cc",
@@ -586,7 +586,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "mock_random",
     srcs = [
         "mock_random.cc",
@@ -600,7 +600,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "mock_quic_dispatcher",
     srcs = [
         "mock_quic_dispatcher.cc",
@@ -619,7 +619,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "mock_quic_spdy_client_stream",
     srcs = [
         "mock_quic_spdy_client_stream.cc",
@@ -636,7 +636,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "mock_quic_client_promised_info",
     srcs = [
         "mock_quic_client_promised_info.cc",
@@ -652,7 +652,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "simple_quic_framer",
     srcs = [
         "simple_quic_framer.cc",
@@ -670,7 +670,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "simple_data_producer",
     srcs = [
         "simple_data_producer.cc",
@@ -689,7 +689,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "simple_session_notifier_lib",
     srcs = [
         "simple_session_notifier.cc",
@@ -717,7 +717,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "fake_proof_source",
     srcs = [
         "fake_proof_source.cc",
@@ -734,7 +734,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "failing_proof_source",
     srcs = [
         "failing_proof_source.cc",

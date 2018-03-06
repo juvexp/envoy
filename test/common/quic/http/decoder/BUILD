@@ -56,7 +56,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_frame_decoder_state_test_util_lib",
     testonly = 1,
     srcs = [
@@ -75,7 +75,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_frame_decoder_listener_test_util_lib",
     testonly = 1,
     srcs = [
@@ -162,7 +162,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_structure_decoder_test_util_lib",
     testonly = 1,
     srcs = [

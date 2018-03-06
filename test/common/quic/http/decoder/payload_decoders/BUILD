@@ -3,7 +3,7 @@
 
 package(default_visibility = ["//source/common/quic/http:gfe_quic"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "envoy_cc_test_library")
+load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
 
 ################################################################################
 # Libraries (i.e. production code).
@@ -121,7 +121,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_test_library(
+cc_test_library(
     name = "quic_http_payload_decoder_base_test_util_lib",
     srcs = [
         "quic_http_payload_decoder_base_test_util.cc",

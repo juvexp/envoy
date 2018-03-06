@@ -7,7 +7,7 @@ package(default_visibility = ["//source/common/quic/http:gfe_quic"])
 ################################################################################
 # Libraries (i.e. production code).
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_settings_lib",
     testonly = 1,
     srcs = [

@@ -4,7 +4,7 @@
 
 package(default_visibility = ["//source/common/quic/core:internal"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "envoy_cc_test_library")
+load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
 load("//tools/build_rules:build_test.bzl", "build_test")
 
 package_group(
@@ -1034,7 +1034,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "end_to_end_test_lib",
     testonly = 1,
     srcs = [

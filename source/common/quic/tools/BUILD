@@ -3,7 +3,7 @@
 
 package(default_visibility = [":internal"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "envoy_cc_test_library")
+load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
 
 package_group(
     name = "internal",

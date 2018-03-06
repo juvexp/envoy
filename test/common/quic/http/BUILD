@@ -32,7 +32,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_constants_test_util_lib",
     testonly = 1,
     srcs = [
@@ -68,7 +68,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_structures_test_util_lib",
     testonly = 1,
     srcs = [

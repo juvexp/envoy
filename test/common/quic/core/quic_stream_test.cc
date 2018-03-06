@@ -145,7 +145,7 @@ class QuicStreamTest : public QuicTestWithParam<bool> {
   }
 
   bool HasWriteBlockedStreams() {
-    return write_blocked_list_->HasWriteBlockedCryptoOrHeadersStream() ||
+    return write_blocked_list_->HasWriteBlockedSpecialStream() ||
            write_blocked_list_->HasWriteBlockedDataStreams();
   }
 

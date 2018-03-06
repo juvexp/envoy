@@ -3,7 +3,7 @@
 
 package(default_visibility = ["//source/common/quic/http:gfe_quic"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "envoy_cc_test_library")
+load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
 
 ################################################################################
 # Libraries.
@@ -11,7 +11,7 @@ load("//gfe/gfe2/tools:build_defs.bzl", "envoy_cc_test_library")
 ################################################################################
 # Tests of the above libraries and test support.
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_frame_formatter_lib",
     testonly = 1,
     srcs = [
@@ -50,7 +50,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_gunit_helpers_lib",
     testonly = 1,
     hdrs = ["quic_http_gunit_helpers.h"],
@@ -61,7 +61,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_frame_builder_lib",
     testonly = 1,
     srcs = [
@@ -92,7 +92,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_message_generator_lib",
     testonly = 1,
     srcs = [
@@ -113,7 +113,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_message_interface_lib",
     testonly = 1,
     srcs = [
@@ -126,7 +126,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_test_library(
+cc_test_library(
     name = "quic_http_random_decoder_test_lib",
     srcs = [
         "quic_http_random_decoder_test.cc",
@@ -166,7 +166,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_random_util_lib",
     testonly = 1,
     srcs = [
@@ -200,7 +200,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_stream_generator_lib",
     testonly = 1,
     srcs = [
@@ -245,7 +245,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_http_stream_id_generator_lib",
     testonly = 1,
     srcs = [

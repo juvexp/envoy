@@ -65,7 +65,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_test_lib",
     testonly = 1,
     hdrs = [
@@ -76,7 +76,7 @@ envoy_cc_library(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_test_lib_no_google3",
     testonly = 1,
     hdrs = [
@@ -120,7 +120,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_test_loopback_lib",
     testonly = 1,
     srcs = ["quic_test_loopback.cc"],
@@ -143,7 +143,7 @@ envoy_cc_test(
     ],
 )
 
-envoy_cc_library(
+envoy_cc_test_library(
     name = "quic_test_mem_slice_vector_lib",
     testonly = 1,
     hdrs = [
