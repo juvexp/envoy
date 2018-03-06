@@ -12,7 +12,6 @@ load(
 
 envoy_package()
 
-
 envoy_cc_test(
     name = "quic_ref_counted_test",
     srcs = ["quic_reference_counted_test.cc"],
