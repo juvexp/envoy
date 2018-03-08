@@ -28,7 +28,7 @@ class QuicMemSliceSpanImplTest : public QuicTest {
  public:
   QuicMemSliceSpanImplTest() {
     for (size_t i = 0; i < 10; ++i) {
-      buffers_.push_back(make_pair(data_, 1024));
+      buffers_.push_back(std::make_pair(data_, 1024));
     }
   }
 

@@ -164,15 +164,15 @@ class QUIC_EXPORT_PRIVATE QuicFixedUint128 : public QuicConfigValue {
 
   bool HasSendValue() const;
 
-  uint128 GetSendValue() const;
+  absl::uint128 GetSendValue() const;
 
-  void SetSendValue(uint128 value);
+  void SetSendValue(absl::uint128 value);
 
   bool HasReceivedValue() const;
 
-  uint128 GetReceivedValue() const;
+  absl::uint128 GetReceivedValue() const;
 
-  void SetReceivedValue(uint128 value);
+  void SetReceivedValue(absl::uint128 value);
 
   // If has_send_value is true, serialises |tag_| and |send_value_| to |out|.
   void ToHandshakeMessage(CryptoHandshakeMessage* out) const override;
@@ -183,9 +183,9 @@ class QUIC_EXPORT_PRIVATE QuicFixedUint128 : public QuicConfigValue {
                                  QuicString* error_details) override;
 
  private:
-  uint128 send_value_;
+  absl::uint128 send_value_;
   bool has_send_value_;
-  uint128 receive_value_;
+  absl::uint128 receive_value_;
   bool has_receive_value_;
 };
 
@@ -402,11 +402,11 @@ class QUIC_EXPORT_PRIVATE QuicConfig {
 
   bool SupportMaxHeaderListSize() const;
 
-  void SetStatelessResetTokenToSend(uint128 stateless_reset_token);
+  void SetStatelessResetTokenToSend(absl::uint128 stateless_reset_token);
 
   bool HasReceivedStatelessResetToken() const;
 
-  uint128 ReceivedStatelessResetToken() const;
+  absl::uint128 ReceivedStatelessResetToken() const;
 
   bool negotiated() const;
 

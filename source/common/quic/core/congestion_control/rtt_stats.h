@@ -92,7 +92,7 @@ class QUIC_EXPORT_PRIVATE RttStats {
 
   void set_initial_max_ack_delay(QuicTime::Delta initial_max_ack_delay) {
     DCHECK(max_ack_delay_.IsZero());
-    max_ack_delay_ = max(max_ack_delay_, initial_max_ack_delay);
+    max_ack_delay_ = std::max(max_ack_delay_, initial_max_ack_delay);
   }
 
  private:

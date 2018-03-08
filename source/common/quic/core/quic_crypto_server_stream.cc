@@ -26,6 +26,7 @@
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/core/quic_session.h"
 #include "common/quic/core/tls_server_handshaker.h"
+#include "common/quic/platform/api/quic_flag_utils.h"
 #include "common/quic/platform/api/quic_flags.h"
 #include "common/quic/platform/api/quic_logging.h"
 #include "common/quic/platform/api/quic_ptr_util.h"
@@ -180,6 +181,8 @@ void QuicCryptoServerStream::OnSuccessfulVersionNegotiation(
   if (!delay_handshaker_construction_) {
     return;
   }
+  QUIC_FLAG_COUNT(
+      gfe2_reloadable_flag_delay_quic_server_handshaker_construction);
   CHECK(!handshaker_);
   switch (session()->connection()->version().handshake_protocol) {
     case PROTOCOL_QUIC_CRYPTO:

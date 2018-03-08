@@ -12,8 +12,8 @@
 
 package(default_visibility = [
     "//gfe/gfe2:gfe2_internal",
-    "//source/common/quic:__subpackages__",
-    "//source/common/quic/spdy_utils:__subpackages__",
+    "//gfe/quic:__subpackages__",
+    "//gfe/spdy:__subpackages__",
 ])
 
 envoy_cc_test(
@@ -30,14 +30,13 @@ envoy_cc_test(
 
 envoy_cc_test_library(
     name = "spdy_no_op_visitor_lib",
-    testonly = 1,
     srcs = ["spdy_no_op_visitor.cc"],
     hdrs = ["spdy_no_op_visitor.h"],
     visibility = [
         "//gfe/gfe2:gfe2_internal",
         "//gfe/http2/tools:__pkg__",
-        "//source/common/quic:__subpackages__",
-        "//source/common/quic/spdy_utils:__subpackages__",
+        "//gfe/quic:__subpackages__",
+        "//gfe/spdy:__subpackages__",
     ],
     deps = [
         "//source/common/quic/spdy_utils/core:http2_deframer_lib",
@@ -71,7 +70,6 @@ envoy_cc_test(
 
 envoy_cc_test_library(
     name = "spdy_test_utils_lib",
-    testonly = 1,
     srcs = ["spdy_test_utils.cc"],
     hdrs = ["spdy_test_utils.h"],
     deps = [
@@ -90,16 +88,15 @@ envoy_cc_test_library(
 
 envoy_cc_test_library(
     name = "spdy_deframer_visitor_lib",
-    testonly = 1,
     srcs = ["spdy_deframer_visitor.cc"],
     hdrs = ["spdy_deframer_visitor.h"],
     deps = [
         "//source/common/quic/spdy_utils/core:http2_deframer_lib",
-        "//source/common/quic/spdy_utils/core:mock_spdy_framer_visitor",
+        ":mock_spdy_framer_visitor",
         "//source/common/quic/spdy_utils/core:spdy_frame_reader_lib",
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
-        "//source/common/quic/spdy_utils/core:spdy_protocol_test_utils_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_protocol_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//base",
         "//source/common/quic/spdy_utils/core/hpack:hpack_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_flags_lib",
@@ -113,12 +110,11 @@ envoy_cc_test_library(
 
 envoy_cc_test_library(
     name = "spdy_protocol_test_utils_lib",
-    testonly = 1,
     srcs = ["spdy_protocol_test_utils.cc"],
     hdrs = ["spdy_protocol_test_utils.h"],
     deps = [
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//base",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_piece_lib",
         "//testing/base/public:gunit_for_library",
@@ -127,7 +123,6 @@ envoy_cc_test_library(
 
 envoy_cc_test_library(
     name = "mock_spdy_framer_visitor",
-    testonly = 1,
     srcs = [
         "mock_spdy_framer_visitor.cc",
     ],
@@ -136,7 +131,7 @@ envoy_cc_test_library(
     ],
     deps = [
         "//source/common/quic/spdy_utils/core:http2_deframer_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_ptr_util_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_piece_lib",
         "//testing/base/public:gunit_for_library",
@@ -147,13 +142,13 @@ envoy_cc_test(
     name = "spdy_deframer_visitor_test",
     srcs = ["spdy_deframer_visitor_test.cc"],
     deps = [
-        "//source/common/quic/spdy_utils/core:mock_spdy_framer_visitor",
-        "//source/common/quic/spdy_utils/core:spdy_deframer_visitor_lib",
+        ":mock_spdy_framer_visitor",
+        ":spdy_deframer_visitor_lib",
         "//source/common/quic/spdy_utils/core:spdy_frame_reader_lib",
         "//source/common/quic/spdy_utils/core:spdy_framer_lib",
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
-        "//source/common/quic/spdy_utils/core:spdy_protocol_test_utils_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_protocol_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//base",
         "//source/common/quic/spdy_utils/core/hpack:hpack_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_ptr_util_lib",
@@ -171,11 +166,11 @@ envoy_cc_test(
     shard_count = 5,
     deps = [
         "//source/common/quic/spdy_utils/core:array_output_buffer_lib",
-        "//source/common/quic/spdy_utils/core:mock_spdy_framer_visitor",
+        ":mock_spdy_framer_visitor",
         "//source/common/quic/spdy_utils/core:spdy_frame_reader_lib",
         "//source/common/quic/spdy_utils/core:spdy_framer_lib",
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//base",
         "//source/common/quic/spdy_utils/core/hpack:hpack_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_flags_lib",
@@ -213,7 +208,7 @@ envoy_cc_test(
     srcs = ["spdy_header_block_test.cc"],
     deps = [
         "//source/common/quic/spdy_utils/core:spdy_header_block_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -232,7 +227,7 @@ envoy_cc_test(
     srcs = ["spdy_protocol_test.cc"],
     deps = [
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//base",
         "//source/common/quic/spdy_utils/platform/api:spdy_flags_lib",
         "//testing/base/public:gunit_main",
@@ -245,7 +240,7 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/spdy_utils/core:priority_write_scheduler_lib",
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        ":spdy_test_utils_lib",
         "//testing/base/public:gunit_main",
     ],
 )

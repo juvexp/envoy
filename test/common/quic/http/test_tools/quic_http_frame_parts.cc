@@ -436,16 +436,16 @@ void QuicHttpFrameParts::OnFrameSizeError(const QuicHttpFrameHeader& header) {
 void QuicHttpFrameParts::OutputTo(std::ostream& out) const {
   out << "QuicHttpFrameParts{\n  frame_header: " << frame_header << "\n";
   if (!payload.empty()) {
-    out << "  payload=\"" << strings::CHexEscape(payload) << "\"\n";
+    out << "  payload=\"" << absl::CHexEscape(payload) << "\"\n";
   }
   if (!padding.empty()) {
-    out << "  padding=\"" << strings::CHexEscape(padding) << "\"\n";
+    out << "  padding=\"" << absl::CHexEscape(padding) << "\"\n";
   }
   if (!altsvc_origin.empty()) {
-    out << "  altsvc_origin=\"" << strings::CHexEscape(altsvc_origin) << "\"\n";
+    out << "  altsvc_origin=\"" << absl::CHexEscape(altsvc_origin) << "\"\n";
   }
   if (!altsvc_value.empty()) {
-    out << "  altsvc_value=\"" << strings::CHexEscape(altsvc_value) << "\"\n";
+    out << "  altsvc_value=\"" << absl::CHexEscape(altsvc_value) << "\"\n";
   }
   if (opt_priority) {
     out << "  priority=" << opt_priority.value() << "\n";

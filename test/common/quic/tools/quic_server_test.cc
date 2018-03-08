@@ -44,7 +44,7 @@ namespace {
 class QuicServerTest : public QuicTest {};
 
 TEST_F(QuicServerTest, TestDroppedPackets) {
-  int port = PickUnusedPortOrDie();
+  int port = net_util::PickUnusedPortOrDie();
 
   QuicSocketAddress server_address(TestLoopback(), port);
   QuicHttpResponseCache response_cache;
@@ -141,7 +141,8 @@ class TestQuicServer : public QuicServer {
 class QuicServerEpollInTest : public QuicTest {
  public:
   QuicServerEpollInTest()
-      : port_(PickUnusedPortOrDie()), server_address_(TestLoopback(), port_) {}
+      : port_(net_util::PickUnusedPortOrDie()),
+        server_address_(TestLoopback(), port_) {}
 
   void StartListening() {
     server_.CreateUDPSocketAndListen(server_address_);

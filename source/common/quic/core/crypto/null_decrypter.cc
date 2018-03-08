@@ -59,7 +59,7 @@ bool NullDecrypter::DecryptPacket(QuicTransportVersion version,
                                   size_t max_output_length) {
   QuicDataReader reader(ciphertext.data(), ciphertext.length(),
                         HOST_BYTE_ORDER);
-  uint128 hash;
+  absl::uint128 hash;
 
   if (!ReadHash(&reader, &hash)) {
     return false;
@@ -99,7 +99,7 @@ uint32_t NullDecrypter::cipher_id() const {
   return 0;
 }
 
-bool NullDecrypter::ReadHash(QuicDataReader* reader, uint128* hash) {
+bool NullDecrypter::ReadHash(QuicDataReader* reader, absl::uint128* hash) {
   uint64_t lo;
   uint32_t hi;
   if (!reader->ReadUInt64(&lo) || !reader->ReadUInt32(&hi)) {
@@ -109,10 +109,10 @@ bool NullDecrypter::ReadHash(QuicDataReader* reader, uint128* hash) {
   return true;
 }
 
-uint128 NullDecrypter::ComputeHash(QuicTransportVersion version,
-                                   const QuicStringPiece data1,
-                                   const QuicStringPiece data2) const {
-  uint128 correct_hash;
+absl::uint128 NullDecrypter::ComputeHash(QuicTransportVersion version,
+                                         const QuicStringPiece data1,
+                                         const QuicStringPiece data2) const {
+  absl::uint128 correct_hash;
   if (version > QUIC_VERSION_35) {
     if (perspective_ == Perspective::IS_CLIENT) {
       // Peer is a server.
@@ -125,7 +125,7 @@ uint128 NullDecrypter::ComputeHash(QuicTransportVersion version,
   } else {
     correct_hash = QuicUtils::FNV1a_128_Hash_Two(data1, data2);
   }
-  uint128 mask = MakeUint128(UINT64_C(0x0), UINT64_C(0xffffffff));
+  absl::uint128 mask = MakeUint128(UINT64_C(0x0), UINT64_C(0xffffffff));
   mask <<= 96;
   correct_hash &= ~mask;
   return correct_hash;

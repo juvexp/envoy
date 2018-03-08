@@ -215,8 +215,6 @@ class QuicClientBase {
     }
   }
 
-  void reset_writer() { writer_.reset(); }
-
   ProofVerifier* proof_verifier() const;
 
   void set_bind_to_address(QuicIpAddress address) {

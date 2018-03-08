@@ -7,14 +7,14 @@ package_group(
     packages = [
         "//gfe/cluster_broker/...",
         "//gfe/gfe2/...",
-        "//source/common/quic/...",
+        "//gfe/quic/...",
         "//gfe/test_tools/...",
         "//net/hostdatapath/common/protocols",
         "//video/streaming/quic",
     ],
 )
 
-default_visibility = ["//source/common/quic/core/crypto:internal"]
+default_visibility = [":internal"]
 
 package(default_visibility = default_visibility)
 
@@ -25,7 +25,7 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//source/common/quic/core/crypto:quic_random_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -36,7 +36,7 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -51,9 +51,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_endian_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_random",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_random",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -70,10 +70,10 @@ envoy_cc_test(
         "//source/common/quic/core/proto:portable_quic_core_proto",
         "//source/common/quic/platform/api:quic_socket_address_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:quic_crypto_server_config_peer",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
+        "//test/common/quic/test_tools:quic_crypto_server_config_peer",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -84,7 +84,7 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
         "//third_party/openssl:crypto",
     ],
@@ -94,7 +94,7 @@ envoy_cc_test(
     name = "proof_test_google3",
     srcs = ["proof_test_google3.cc"],
     data = [
-        "//source/common/quic/core/crypto/testdata",
+        "//gfe/quic/core/crypto/testdata",
     ],
     deps = [
         "//source/common/quic/core/crypto:crypto_handshake_lib",
@@ -116,8 +116,8 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//source/common/quic/platform/api:quic_str_cat_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//net/http2/server/lib/public:server",
         "//net/httpsconnection:sslconnectionbase",
         "//security/mentat/lib/internal:tls_oracle_signing_impl",
@@ -137,7 +137,7 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//base",
         "//source/common/quic/platform/api:quic_endian_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -148,7 +148,7 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//base",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -161,9 +161,9 @@ envoy_cc_test(
         "//base",
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -175,9 +175,9 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//base",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -192,9 +192,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -204,7 +204,7 @@ envoy_cc_test(
     srcs = ["quic_random_test.cc"],
     deps = [
         "//source/common/quic/core/crypto:quic_random_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -215,8 +215,8 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -227,8 +227,8 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -241,9 +241,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -256,9 +256,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -271,9 +271,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -286,9 +286,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -301,9 +301,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -316,9 +316,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -331,9 +331,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -345,9 +345,9 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -360,9 +360,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -374,9 +374,9 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -390,8 +390,8 @@ envoy_cc_test(
         "//source/common/quic/core:quic_packets_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -402,7 +402,7 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
         "//third_party/openssl:crypto",
     ],
@@ -426,13 +426,13 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//source/common/quic/test_tools:failing_proof_source",
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:mock_random",
-        "//source/common/quic/test_tools:quic_crypto_server_config_peer",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:failing_proof_source",
+        "//test/common/quic/test_tools:mock_clock",
+        "//test/common/quic/test_tools:mock_random",
+        "//test/common/quic/test_tools:quic_crypto_server_config_peer",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
         "//third_party/openssl:crypto",
     ],
@@ -446,7 +446,7 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:quic_random_lib",
         "//base",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -457,8 +457,8 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )

@@ -39,7 +39,7 @@ namespace {
 #endif
 
 #ifdef QUIC_UTIL_HAS_UINT128
-uint128 IncrementalHashFast(uint128 uhash, QuicStringPiece data) {
+absl::uint128 IncrementalHashFast(absl::uint128 uhash, QuicStringPiece data) {
   // This code ends up faster than the naive implementation for 2 reasons:
   // 1. uint128 from base/int128.h is sufficiently complicated that the compiler
   //    cannot transform the multiplication by kPrime into a shift-multiply-add;
@@ -49,8 +49,9 @@ uint128 IncrementalHashFast(uint128 uhash, QuicStringPiece data) {
   // kPrime = 309485009821345068724781371
   static const __uint128_t kPrime =
       (static_cast<__uint128_t>(16777216) << 64) + 315;
-  __uint128_t xhash = (static_cast<__uint128_t>(Uint128High64(uhash)) << 64) +
-                      Uint128Low64(uhash);
+  __uint128_t xhash =
+      (static_cast<__uint128_t>(absl::Uint128High64(uhash)) << 64) +
+      absl::Uint128Low64(uhash);
   const uint8_t* octets = reinterpret_cast<const uint8_t*>(data.data());
   for (size_t i = 0; i < data.length(); ++i) {
     xhash = (xhash ^ octets[i]) * kPrime;
@@ -75,7 +76,7 @@ uint128 IncrementalHashSlow(uint128 hash, QuicStringPiece data) {
 }
 #endif
 
-uint128 IncrementalHash(uint128 hash, QuicStringPiece data) {
+absl::uint128 IncrementalHash(absl::uint128 hash, QuicStringPiece data) {
 #ifdef QUIC_UTIL_HAS_UINT128
   return IncrementalHashFast(hash, data);
 #else
@@ -103,27 +104,27 @@ uint64_t QuicUtils::FNV1a_64_Hash(QuicStringPiece data) {
 }
 
 // static
-uint128 QuicUtils::FNV1a_128_Hash(QuicStringPiece data) {
+absl::uint128 QuicUtils::FNV1a_128_Hash(QuicStringPiece data) {
   return FNV1a_128_Hash_Three(data, QuicStringPiece(), QuicStringPiece());
 }
 
 // static
-uint128 QuicUtils::FNV1a_128_Hash_Two(QuicStringPiece data1,
-                                      QuicStringPiece data2) {
+absl::uint128 QuicUtils::FNV1a_128_Hash_Two(QuicStringPiece data1,
+                                            QuicStringPiece data2) {
   return FNV1a_128_Hash_Three(data1, data2, QuicStringPiece());
 }
 
 // static
-uint128 QuicUtils::FNV1a_128_Hash_Three(QuicStringPiece data1,
-                                        QuicStringPiece data2,
-                                        QuicStringPiece data3) {
+absl::uint128 QuicUtils::FNV1a_128_Hash_Three(QuicStringPiece data1,
+                                              QuicStringPiece data2,
+                                              QuicStringPiece data3) {
   // The two constants are defined as part of the hash algorithm.
   // see http://www.isthe.com/chongo/tech/comp/fnv/
   // kOffset = 144066263297769815596495629667062367629
-  const uint128 kOffset =
+  const absl::uint128 kOffset =
       MakeUint128(UINT64_C(7809847782465536322), UINT64_C(7113472399480571277));
 
-  uint128 hash = IncrementalHash(kOffset, data1);
+  absl::uint128 hash = IncrementalHash(kOffset, data1);
   if (data2.empty()) {
     return hash;
   }
@@ -136,9 +137,9 @@ uint128 QuicUtils::FNV1a_128_Hash_Three(QuicStringPiece data1,
 }
 
 // static
-void QuicUtils::SerializeUint128Short(uint128 v, uint8_t* out) {
-  const uint64_t lo = Uint128Low64(v);
-  const uint64_t hi = Uint128High64(v);
+void QuicUtils::SerializeUint128Short(absl::uint128 v, uint8_t* out) {
+  const uint64_t lo = absl::Uint128Low64(v);
+  const uint64_t hi = absl::Uint128High64(v);
   // This assumes that the system is little-endian.
   memcpy(out, &lo, sizeof(lo));
   memcpy(out + sizeof(lo), &hi, sizeof(hi) / 2);

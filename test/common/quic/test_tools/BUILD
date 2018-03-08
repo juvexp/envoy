@@ -15,7 +15,7 @@ package_group(
         "//borg/monitoring/b3m/...",
         "//gfe/cluster_broker/...",
         "//gfe/gfe2/...",
-        "//source/common/quic/...",
+        "//gfe/quic/...",
         "//gfe/test_tools/...",
         "//gfe/tools/...",
         "//net/bandaid/internetto/wtrace/agent/...",
@@ -29,7 +29,7 @@ package_group(
 
 package(
     default_testonly = 1,
-    default_visibility = ["//source/common/quic/test_tools:internal"],
+    default_visibility = [":internal"],
 )
 
 envoy_cc_test_library(
@@ -85,9 +85,9 @@ envoy_cc_test_library(
         "quic_crypto_server_config_peer.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:mock_random",
-        "//source/common/quic/test_tools:quic_test_utils",
+        ":mock_clock",
+        ":mock_random",
+        ":quic_test_utils",
         "//base",
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
@@ -182,7 +182,7 @@ envoy_cc_test_library(
         "quic_test_server.h",
     ],
     visibility = [
-        "//source/common/quic/test_tools:internal",
+        ":internal",
         "//borg/monitoring/b3m:__pkg__",
     ],
     deps = [
@@ -270,7 +270,7 @@ envoy_cc_test_library(
         "//source/common/quic/core:quic_stream_sequencer_buffer_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
     ],
 )
 
@@ -283,7 +283,7 @@ envoy_cc_test_library(
         "quic_stream_sequencer_peer.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_stream_sequencer_buffer_peer",
+        ":quic_stream_sequencer_buffer_peer",
         "//base",
         "//source/common/quic/core:quic_packets_lib",
         "//source/common/quic/core:quic_session_lib",
@@ -315,16 +315,16 @@ envoy_cc_test_library(
         "quic_test_utils.h",
     ],
     data = [
-        "//source/common/quic/core/crypto/testdata",
+        "//gfe/quic/core/crypto/testdata",
     ],
     deps = [
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:mock_random",
-        "//source/common/quic/test_tools:quic_framer_peer",
-        "//source/common/quic/test_tools:quic_packet_generator_peer",
-        "//source/common/quic/test_tools:quic_sent_packet_manager_peer",
-        "//source/common/quic/test_tools:quic_stream_peer",
-        "//source/common/quic/test_tools:simple_quic_framer",
+        ":mock_clock",
+        ":mock_random",
+        ":quic_framer_peer",
+        ":quic_packet_generator_peer",
+        ":quic_sent_packet_manager_peer",
+        ":quic_stream_peer",
+        ":simple_quic_framer",
         "//base",
         "//file/base",
         "//gfe/gfe2/test_tools:failure_lib",
@@ -364,7 +364,7 @@ envoy_cc_test_library(
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//source/common/quic/platform/api:quic_socket_address_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//source/common/quic/tools:quic_client_lib",
         "//source/common/quic/tools:quic_server_lib",
@@ -385,8 +385,8 @@ envoy_cc_test(
         "quic_test_utils_test.cc",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_test_utils",
-        "//source/common/quic/platform/api:quic_test_lib",
+        ":quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -426,15 +426,15 @@ envoy_cc_test_library(
         "packet_dropping_test_writer.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_test_client_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        ":quic_test_client_lib",
+        ":quic_test_utils",
         "//base",
         "//source/common/quic/core:quic_alarm_lib",
         "//source/common/quic/core:quic_epoll_connection_helper_lib",
         "//source/common/quic/core:quic_packet_writer_lib",
         "//source/common/quic/platform/api:quic_clock_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
-        "//source/common/quic/platform/impl:quic_socket_utils_lib",
+        "//gfe/quic/platform/impl:quic_socket_utils_lib",
     ],
 )
 
@@ -462,9 +462,9 @@ envoy_cc_test_library(
         "quic_test_client.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_spdy_session_peer",
-        "//source/common/quic/test_tools:quic_stream_peer",
-        "//source/common/quic/test_tools:quic_test_utils",
+        ":quic_spdy_session_peer",
+        ":quic_stream_peer",
+        ":quic_test_utils",
         "//base",
         "//gfe/gfe2/base:epoll_executor",
         "//gfe/gfe2/quic:gfe_quic_dispatcher_lib",
@@ -502,7 +502,7 @@ envoy_cc_test_library(
         "quic_stream_peer.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_stream_send_buffer_peer",
+        ":quic_stream_send_buffer_peer",
         "//base",
         "//source/common/quic/core:quic_packets_lib",
         "//source/common/quic/core:quic_session_lib",
@@ -582,7 +582,7 @@ envoy_cc_test_library(
     deps = [
         "//base",
         "//gfe/gfe2/test_tools:includes",
-        "//source/common/quic/platform/impl:quic_epoll_clock_lib",
+        "//gfe/quic/platform/impl:quic_epoll_clock_lib",
     ],
 )
 
@@ -609,7 +609,7 @@ envoy_cc_test_library(
         "mock_quic_dispatcher.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_test_utils",
+        ":quic_test_utils",
         "//base",
         "//source/common/quic/core:quic_config_lib",
         "//source/common/quic/core:quic_packets_lib",
@@ -698,7 +698,7 @@ envoy_cc_test_library(
         "simple_session_notifier.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_test_utils",
+        ":quic_test_utils",
         "//source/common/quic/core:quic_connection_lib",
         "//source/common/quic/core:session_notifier_interface_lib",
         "//source/common/quic/platform/api:quic_map_util_lib",
@@ -710,9 +710,9 @@ envoy_cc_test(
     name = "simple_session_notifier_test",
     srcs = ["simple_session_notifier_test.cc"],
     deps = [
-        "//source/common/quic/test_tools:quic_test_utils",
-        "//source/common/quic/test_tools:simple_session_notifier_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        ":quic_test_utils",
+        ":simple_session_notifier_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -726,7 +726,7 @@ envoy_cc_test_library(
         "fake_proof_source.h",
     ],
     deps = [
-        "//source/common/quic/test_tools:quic_test_utils",
+        ":quic_test_utils",
         "//source/common/quic/core/crypto:proof_source",
         "//source/common/quic/platform/api:quic_logging_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
@@ -752,12 +752,12 @@ envoy_cc_test(
     name = "crypto_test_utils_test",
     srcs = ["crypto_test_utils_test.cc"],
     deps = [
-        "//source/common/quic/test_tools:quic_test_utils",
+        ":quic_test_utils",
         "//source/common/quic/core:quic_session_lib",
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/core/proto:portable_quic_core_proto",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//testing/base/public:gunit_main",
         "//third_party/absl/strings",

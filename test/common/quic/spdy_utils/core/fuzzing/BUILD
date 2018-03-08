@@ -9,7 +9,7 @@ envoy_cc_test(
         "//source/common/quic/spdy_utils/core/fuzzing:hpack_fuzz_util",
         "//file/base",
         "//file/localfile",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        "//test/common/quic/spdy_utils/core:spdy_test_utils_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_utils_lib",
         "//testing/base/public:gunit_main",
         "//util/random:random_no_openssl",

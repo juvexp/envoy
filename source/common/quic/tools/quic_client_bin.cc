@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Determine IP address to connect to from supplied hostname.
-  std::vector<IPAddress> ipvec;
+  std::vector<net_base::IPAddress> ipvec;
   if (!net_dns::HostLookup::GetIPAddrInfo(host, &ipvec, nullptr, nullptr,
                                           nullptr)) {
     cerr << "Failed to resolve '" << host << "'" << endl;

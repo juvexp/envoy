@@ -325,8 +325,6 @@ class QUIC_EXPORT_PRIVATE QuicSession : public QuicConnectionVisitorInterface,
 
   bool register_streams_early() const { return register_streams_early_; }
 
-  bool use_control_frame_manager() const;
-
   bool session_decides_what_to_write() const;
 
  protected:
@@ -445,7 +443,7 @@ class QUIC_EXPORT_PRIVATE QuicSession : public QuicConnectionVisitorInterface,
 
   // Returns a stateless reset token which will be included in the public reset
   // packet.
-  virtual uint128 GetStatelessResetToken() const;
+  virtual absl::uint128 GetStatelessResetToken() const;
 
   QuicControlFrameManager& control_frame_manager() {
     return control_frame_manager_;

@@ -219,7 +219,7 @@ util::StatusOr<QuicString> ParseCharLiteralsInLine(QuicStringPiece line,
             "Unable to parse char literal starting at: ", line.substr(0, 10)));
       }
       literal = line.substr(0, num_digits);
-      if (!safe_strto32_base(literal, &value, 0)) {
+      if (!strings::safe_strto32_base(literal, &value, 0)) {
         return util::InternalError(
             QuicStrCat("Unable to parse \"", literal,
                        "\"; error code or possible value=", value));
@@ -248,7 +248,7 @@ util::StatusOr<QuicString> ParseCharLiteralsInLine(QuicStringPiece line,
             "Unable to parse char literal starting at: ", line.substr(0, 10)));
       }
       literal = line.substr(0, num_digits);
-      if (!safe_strto32_base(literal, &value, 0)) {
+      if (!strings::safe_strto32_base(literal, &value, 0)) {
         return util::InternalError(
             QuicStrCat("Unable to parse \"", literal,
                        "\"; error code or possible value=", value));
@@ -996,7 +996,7 @@ class FileFormatter {
   }
 
   void AppendStringToOutput(QuicString s) {
-    StripTrailingNewline(&s);
+    strings::StripTrailingNewline(&s);
     std::unique_ptr<QuicString> sptr(new QuicString(std::move(s)));
     StringPieceStorage sps(std::move(sptr));
     output_lines_.push_back(std::move(sps));

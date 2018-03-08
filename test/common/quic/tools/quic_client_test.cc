@@ -88,7 +88,7 @@ TEST_F(QuicClientTest, DoNotLeakSocketFDs) {
   const int kNumClients = 50;
   for (int i = 0; i < kNumClients; ++i) {
     std::unique_ptr<QuicClient> client(
-        CreateAndInitializeQuicClient(&eps, PickUnusedPortOrDie()));
+        CreateAndInitializeQuicClient(&eps, net_util::PickUnusedPortOrDie()));
 
     // Initializing the client will create a new FD.
     EXPECT_LT(number_of_open_fds, NumOpenSocketFDs());
@@ -103,7 +103,7 @@ TEST_F(QuicClientTest, CreateAndCleanUpUDPSockets) {
   size_t number_of_open_fds = NumOpenSocketFDs();
 
   std::unique_ptr<QuicClient> client(
-      CreateAndInitializeQuicClient(&eps, PickUnusedPortOrDie()));
+      CreateAndInitializeQuicClient(&eps, net_util::PickUnusedPortOrDie()));
   EXPECT_EQ(number_of_open_fds + 1, NumOpenSocketFDs());
   // Create more UDP sockets.
   EXPECT_TRUE(QuicClientPeer::CreateUDPSocketAndBind(client.get()));

@@ -47,7 +47,7 @@ class SslIndexSingleton {
     CHECK_LE(0, ssl_ex_data_index_handshaker_);
   }
 
-  friend QuicSingleton<SslIndexSingleton>;
+  friend QuicSingletonFriend<SslIndexSingleton>;
 
   int ssl_ex_data_index_handshaker_;
 

@@ -77,8 +77,8 @@ static void ProcessFileAndRespond(
     const HttpRequestInfo_Payload& payload = request.payload(i);
     if (payload.has_bs2_info()) {
       response->mutable_payload()->set_data(
-      StrCat("<html><body><p>Your upload is located at ",
-             payload.bs2_info().blob_id(), "</p></body></html>"));
+          absl::StrCat("<html><body><p>Your upload is located at ",
+                       payload.bs2_info().blob_id(), "</p></body></html>"));
     }
   }
   response->set_http_status(HTTPResponse::RC_REQUEST_OK);
@@ -186,7 +186,7 @@ void SimpleAgent::OnResponseSent(
 
 int main(int argc, char* argv[]) {
   InitGoogle(argv[0], &argc, &argv, true);
-  SelectServer ss;
+  net_base::SelectServer ss;
   HTTPServer http(&ss, FLAGS_port, "SimpleAgent");
   uploader_tutorial::SimpleAgent agent;
   rpc2::EnableRPC2(&agent, rpc2::ServiceParameters());

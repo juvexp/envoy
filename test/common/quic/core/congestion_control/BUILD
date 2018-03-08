@@ -2,13 +2,13 @@
 #   Code for QUIC congestion control (see go/quic for links to details) this
 #   will either be shared between chrome-gfe or to-be-opensourced.
 
-package(default_visibility = ["//source/common/quic/core/congestion_control:internal"])
+package(default_visibility = [":internal"])
 
 package_group(
     name = "internal",
     packages = [
         "//gfe/gfe2/...",
-        "//source/common/quic/...",
+        "//gfe/quic/...",
         "//third_party/pcc_quic/...",
     ],
 )
@@ -23,7 +23,7 @@ envoy_cc_test(
         "//source/common/quic/core/congestion_control:windowed_filter_lib",
         "//source/common/quic/core:quic_bandwidth_lib",
         "//source/common/quic/core:quic_packets_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -35,8 +35,8 @@ envoy_cc_test(
     ],
     deps = [
         "//source/common/quic/core/congestion_control:rtt_stats_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:rtt_stats_peer",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:rtt_stats_peer",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -51,9 +51,9 @@ envoy_cc_test(
         "//source/common/quic/core:quic_packets_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -67,8 +67,8 @@ envoy_cc_test(
         "//source/common/quic/core/congestion_control:tcp_cubic_bytes_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//source/common/quic/platform/api:quic_str_cat_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -81,7 +81,7 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/congestion_control:tcp_cubic_helper",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -95,7 +95,7 @@ envoy_cc_test(
         "//source/common/quic/core/congestion_control:tcp_cubic_helper",
         "//source/common/quic/core:quic_constants_lib",
         "//source/common/quic/core/crypto:quic_encryption_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -114,9 +114,9 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:quic_config_peer",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
+        "//test/common/quic/test_tools:quic_config_peer",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -131,8 +131,8 @@ envoy_cc_test(
         "//source/common/quic/core/congestion_control:rtt_stats_lib",
         "//source/common/quic/core:quic_unacked_packet_map_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -143,8 +143,8 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core/congestion_control:bandwidth_sampler_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -161,13 +161,13 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:quic_config_peer",
-        "//source/common/quic/test_tools:quic_sent_packet_manager_peer",
-        "//source/common/quic/test_tools:quic_test_utils",
-        "//source/common/quic/test_tools/simulator:quic_endpoint_lib",
-        "//source/common/quic/test_tools/simulator:simulator_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
+        "//test/common/quic/test_tools:quic_config_peer",
+        "//test/common/quic/test_tools:quic_sent_packet_manager_peer",
+        "//test/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools/simulator:quic_endpoint_lib",
+        "//test/common/quic/test_tools/simulator:simulator_lib",
         "//testing/base/public:gunit_main",
     ],
 )
@@ -188,13 +188,13 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//source/common/quic/platform/api:quic_str_cat_lib",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:mock_clock",
-        "//source/common/quic/test_tools:quic_config_peer",
-        "//source/common/quic/test_tools:quic_sent_packet_manager_peer",
-        "//source/common/quic/test_tools:quic_test_utils",
-        "//source/common/quic/test_tools/simulator:quic_endpoint_lib",
-        "//source/common/quic/test_tools/simulator:simulator_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:mock_clock",
+        "//test/common/quic/test_tools:quic_config_peer",
+        "//test/common/quic/test_tools:quic_sent_packet_manager_peer",
+        "//test/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools/simulator:quic_endpoint_lib",
+        "//test/common/quic/test_tools/simulator:simulator_lib",
         "//testing/base/public:gunit_main",
     ],
 )

@@ -1,12 +1,12 @@
 # Description:
 #     Platform independent API used in shared spdy code.
 
-package(default_visibility = ["//source/common/quic/spdy_utils/platform/api:internal"])
+package(default_visibility = [":internal"])
 
 package_group(
     name = "internal",
     packages = [
-        "//source/common/quic/spdy_utils/...",
+        "//gfe/spdy/...",
     ],
 )
 

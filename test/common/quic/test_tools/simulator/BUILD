@@ -1,20 +1,19 @@
 # Description:
 #   Code for simulating a network.  Used in QUIC tests.  Shared with Chrome.
 
-package(default_visibility = ["//source/common/quic/test_tools/simulator:internal"])
+package(default_visibility = [":internal"])
 
 package_group(
     name = "internal",
     packages = [
         "//gfe/gfe2/...",
-        "//source/common/quic/...",
+        "//gfe/quic/...",
         "//third_party/pcc_quic/...",
     ],
 )
 
 envoy_cc_test_library(
     name = "simulator_lib",
-    testonly = 1,
     srcs = [
         "actor.cc",
         "alarm_factory.cc",
@@ -59,19 +58,18 @@ envoy_cc_test(
     name = "simulator_test",
     srcs = ["simulator_test.cc"],
     deps = [
-        "//source/common/quic/test_tools/simulator:simulator_lib",
+        ":simulator_lib",
         "//source/common/quic/platform/api:quic_containers_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )
 
 envoy_cc_test_library(
     name = "quic_endpoint_lib",
-    testonly = 1,
     srcs = [
         "quic_endpoint.cc",
     ],
@@ -79,7 +77,7 @@ envoy_cc_test_library(
         "quic_endpoint.h",
     ],
     deps = [
-        "//source/common/quic/test_tools/simulator:simulator_lib",
+        ":simulator_lib",
         "//base",
         "//source/common/quic/core:quic_connection_lib",
         "//source/common/quic/core:quic_data_lib",
@@ -91,8 +89,8 @@ envoy_cc_test_library(
         "//source/common/quic/platform/api:quic_containers_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//source/common/quic/platform/api:quic_str_cat_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
-        "//source/common/quic/test_tools:simple_session_notifier_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/test_tools:simple_session_notifier_lib",
     ],
 )
 
@@ -100,11 +98,11 @@ envoy_cc_test(
     name = "quic_endpoint_test",
     srcs = ["quic_endpoint_test.cc"],
     deps = [
-        "//source/common/quic/test_tools/simulator:quic_endpoint_lib",
-        "//source/common/quic/test_tools/simulator:simulator_lib",
+        ":quic_endpoint_lib",
+        ":simulator_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
-        "//source/common/quic/test_tools:quic_test_utils",
+        "//test/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/test_tools:quic_test_utils",
         "//testing/base/public:gunit_main",
     ],
 )

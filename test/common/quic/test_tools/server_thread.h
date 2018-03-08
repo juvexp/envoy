@@ -78,13 +78,14 @@ class ServerThread : public Thread {
   void MaybeNotifyOfHandshakeConfirmation();
   void ExecuteScheduledActions();
 
-  Notification confirmed_;  // Notified when the first handshake is confirmed.
-  Notification pause_;      // Notified when the server should pause.
-  Notification paused_;     // Notitied when the server has paused
-  Notification resume_;     // Notified when the server should resume.
-  Notification quit_;       // Notified when the server should quit.
-  Notification goaway_sent_;  // Server can notify client that the
-                              //  goaway has been sent.
+  absl::Notification
+      confirmed_;             // Notified when the first handshake is confirmed.
+  absl::Notification pause_;  // Notified when the server should pause.
+  absl::Notification paused_;       // Notitied when the server has paused
+  absl::Notification resume_;       // Notified when the server should resume.
+  absl::Notification quit_;         // Notified when the server should quit.
+  absl::Notification goaway_sent_;  // Server can notify client that the
+                                    //  goaway has been sent.
 
   std::unique_ptr<QuicServer> server_;
   QuicSocketAddress address_;

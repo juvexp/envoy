@@ -8,12 +8,12 @@ package_group(
         # Temporarily allow gfe2 and spdy access to all targets.
         # TODO: Figure out which targets to expose.
         "//gfe/gfe2/...",
-        "//source/common/quic/http/...",
-        "//source/common/quic/spdy_utils/...",
+        "//gfe/quic/http/...",
+        "//gfe/spdy/...",
     ],
 )
 
-package(default_visibility = ["//source/common/quic/http:gfe_quic"])
+package(default_visibility = ["//gfe/quic/http:gfe_quic"])
 ################################################################################
 # Libraries (i.e. production code).
 
@@ -34,7 +34,6 @@ envoy_cc_test(
 
 envoy_cc_test_library(
     name = "quic_http_constants_test_util_lib",
-    testonly = 1,
     srcs = [
         "quic_http_constants_test_util.cc",
     ],
@@ -56,7 +55,7 @@ envoy_cc_test(
     shard_count = 10,
     deps = [
         "//source/common/quic/http:quic_http_structures_lib",
-        "//source/common/quic/http:quic_http_structures_test_util_lib",
+        ":quic_http_structures_test_util_lib",
         "//base",
         "//source/common/quic/platform/api:quic_str_cat_lib",
         "//source/common/quic/platform/api:quic_string_utils_lib",
@@ -70,7 +69,6 @@ envoy_cc_test(
 
 envoy_cc_test_library(
     name = "quic_http_structures_test_util_lib",
-    testonly = 1,
     srcs = [
         "quic_http_structures_test_util.cc",
     ],
@@ -79,10 +77,10 @@ envoy_cc_test_library(
     ],
     deps = [
         "//source/common/quic/http:quic_http_constants_lib",
-        "//source/common/quic/http:quic_http_constants_test_util_lib",
+        ":quic_http_constants_test_util_lib",
         "//source/common/quic/http:quic_http_structures_lib",
         "//base",
-        "//source/common/quic/http/tools:quic_http_frame_builder_lib",
+        "//test/common/quic/http/tools:quic_http_frame_builder_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_test_random_lib",
         "//testing/base/public:gunit_for_library",

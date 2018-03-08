@@ -19,8 +19,39 @@
 
 namespace gfe_quic {
 
+// Singleton utility. Example usage:
+//
+// In your header:
+//  #include "common/quic/platform/api/quic_singleton.h"
+//  class Foo {
+//   public:
+//    static Foo* GetInstance();
+//    void Bar() { ... }
+//   private:
+//    Foo() { ... }
+//    friend gfe_quic::QuicSingletonFriend<Foo>;
+//  };
+//
+// In your source file:
+//  Foo* Foo::GetInstance() {
+//    return gfe_quic::QuicSingleton<Foo>::get();
+//  }
+//
+// To use the singleton:
+//  Foo::GetInstance()->Bar();
+//
+// NOTE: The method accessing Singleton<T>::get() has to be named as GetInstance
+// and it is important that Foo::GetInstance() is not inlined in the
+// header. This makes sure that when source files from multiple targets include
+// this header they don't end up with different copies of the inlined code
+// creating multiple copies of the singleton.
 template <typename T>
 using QuicSingleton = QuicSingletonImpl<T>;
+
+// Type that a class using QuicSingleton must declare as a friend, in order for
+// QuicSingleton to be able to access the class's private constructor.
+template <typename T>
+using QuicSingletonFriend = QuicSingletonFriendImpl<T>;
 
 }  // namespace gfe_quic
 

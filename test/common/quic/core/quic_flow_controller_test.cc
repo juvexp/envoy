@@ -91,11 +91,7 @@ TEST_F(QuicFlowControllerTest, SendingBytes) {
   EXPECT_EQ(0u, flow_controller_->SendWindowSize());
 
   // BLOCKED frame should get sent.
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
-  } else {
-    EXPECT_CALL(*connection_, SendBlocked(stream_id_)).Times(1);
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
   flow_controller_->MaybeSendBlocked();
 
   // Update the send window, and verify this has unblocked.
@@ -134,12 +130,7 @@ TEST_F(QuicFlowControllerTest, ReceivingBytes) {
             QuicFlowControllerPeer::ReceiveWindowSize(flow_controller_.get()));
 
   // Consume enough bytes to send a WINDOW_UPDATE frame.
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
-  } else {
-    EXPECT_CALL(*connection_, SendWindowUpdate(stream_id_, ::testing::_))
-        .Times(1);
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
 
   flow_controller_->AddBytesConsumed(1 + receive_window_ / 2);
 
@@ -164,14 +155,9 @@ TEST_F(QuicFlowControllerTest, OnlySendBlockedFrameOncePerOffset) {
   EXPECT_EQ(0u, flow_controller_->SendWindowSize());
 
   // Expect that 2 BLOCKED frames should get sent in total.
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_))
-        .Times(2)
-        .WillRepeatedly(
-            Invoke(this, &QuicFlowControllerTest::ClearControlFrame));
-  } else {
-    EXPECT_CALL(*connection_, SendBlocked(stream_id_)).Times(2);
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_))
+      .Times(2)
+      .WillRepeatedly(Invoke(this, &QuicFlowControllerTest::ClearControlFrame));
 
   // BLOCKED frame should get sent.
   flow_controller_->MaybeSendBlocked();
@@ -199,12 +185,7 @@ TEST_F(QuicFlowControllerTest, ReceivingBytesFastIncreasesFlowWindow) {
   should_auto_tune_receive_window_ = true;
   Initialize();
   // This test will generate two WINDOW_UPDATE frames.
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
-  } else {
-    EXPECT_CALL(*connection_, SendWindowUpdate(stream_id_, ::testing::_))
-        .Times(1);
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
   EXPECT_TRUE(flow_controller_->auto_tune_receive_window());
 
   // Make sure clock is inititialized.
@@ -256,15 +237,9 @@ TEST_F(QuicFlowControllerTest, ReceivingBytesFastIncreasesFlowWindow) {
 TEST_F(QuicFlowControllerTest, ReceivingBytesFastNoAutoTune) {
   Initialize();
   // This test will generate two WINDOW_UPDATE frames.
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_))
-        .Times(2)
-        .WillRepeatedly(
-            Invoke(this, &QuicFlowControllerTest::ClearControlFrame));
-  } else {
-    EXPECT_CALL(*connection_, SendWindowUpdate(stream_id_, ::testing::_))
-        .Times(2);
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_))
+      .Times(2)
+      .WillRepeatedly(Invoke(this, &QuicFlowControllerTest::ClearControlFrame));
   EXPECT_FALSE(flow_controller_->auto_tune_receive_window());
 
   // Make sure clock is inititialized.
@@ -317,12 +292,7 @@ TEST_F(QuicFlowControllerTest, ReceivingBytesNormalStableFlowWindow) {
   should_auto_tune_receive_window_ = true;
   Initialize();
   // This test will generate two WINDOW_UPDATE frames.
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
-  } else {
-    EXPECT_CALL(*connection_, SendWindowUpdate(stream_id_, ::testing::_))
-        .Times(1);
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
   EXPECT_TRUE(flow_controller_->auto_tune_receive_window());
 
   // Make sure clock is inititialized.
@@ -377,15 +347,9 @@ TEST_F(QuicFlowControllerTest, ReceivingBytesNormalStableFlowWindow) {
 TEST_F(QuicFlowControllerTest, ReceivingBytesNormalNoAutoTune) {
   Initialize();
   // This test will generate two WINDOW_UPDATE frames.
-  if (connection_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_))
-        .Times(2)
-        .WillRepeatedly(
-            Invoke(this, &QuicFlowControllerTest::ClearControlFrame));
-  } else {
-    EXPECT_CALL(*connection_, SendWindowUpdate(stream_id_, ::testing::_))
-        .Times(2);
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_))
+      .Times(2)
+      .WillRepeatedly(Invoke(this, &QuicFlowControllerTest::ClearControlFrame));
   EXPECT_FALSE(flow_controller_->auto_tune_receive_window());
 
   // Make sure clock is inititialized.

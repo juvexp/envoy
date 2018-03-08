@@ -115,7 +115,7 @@ TEST_F(QuicConfigTest, ProcessServerHello) {
   QuicIpAddress host;
   host.FromString("127.0.3.1");
   const QuicSocketAddress kTestServerAddress = QuicSocketAddress(host, 1234);
-  const uint128 kTestResetToken = 10111100001;
+  const absl::uint128 kTestResetToken = 10111100001;
   QuicConfig server_config;
   QuicTagVector cgst;
   cgst.push_back(kQBIC);

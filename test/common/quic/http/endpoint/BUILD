@@ -2,14 +2,13 @@
 
 # Please put rules in lexical order by name within sections.
 
-package(default_visibility = ["//source/common/quic/http:gfe_quic"])
+package(default_visibility = ["//gfe/quic/http:gfe_quic"])
 
 ################################################################################
 # Libraries (i.e. production code).
 
 envoy_cc_test_library(
     name = "quic_http_settings_lib",
-    testonly = 1,
     srcs = [
         "quic_http_settings.cc",
     ],
@@ -28,9 +27,9 @@ envoy_cc_test(
     name = "quic_http_settings_test",
     srcs = ["quic_http_settings_test.cc"],
     deps = [
-        "//source/common/quic/http/endpoint:quic_http_settings_lib",
+        ":quic_http_settings_lib",
         "//base",
-        "//source/common/quic/http/tools:quic_http_gunit_helpers_lib",
+        "//test/common/quic/http/tools:quic_http_gunit_helpers_lib",
         "//testing/base/public:gunit_main",
     ],
 )

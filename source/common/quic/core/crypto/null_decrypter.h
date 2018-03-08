@@ -58,10 +58,10 @@ class QUIC_EXPORT_PRIVATE NullDecrypter : public QuicDecrypter {
   uint32_t cipher_id() const override;
 
  private:
-  bool ReadHash(QuicDataReader* reader, uint128* hash);
-  uint128 ComputeHash(QuicTransportVersion version,
-                      QuicStringPiece data1,
-                      QuicStringPiece data2) const;
+  bool ReadHash(QuicDataReader* reader, absl::uint128* hash);
+  absl::uint128 ComputeHash(QuicTransportVersion version,
+                            QuicStringPiece data1,
+                            QuicStringPiece data2) const;
 
   Perspective perspective_;
 

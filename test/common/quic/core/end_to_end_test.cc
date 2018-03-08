@@ -279,7 +279,7 @@ class EndToEndTest : public QuicTestWithParam<TestParams> {
   EndToEndTest()
       : initialized_(false),
         server_address_(
-            QuicSocketAddress(TestLoopback(), PickUnusedPortOrDie())),
+            QuicSocketAddress(TestLoopback(), net_util::PickUnusedPortOrDie())),
         server_hostname_("test.example.com"),
         client_writer_(nullptr),
         server_writer_(nullptr),
@@ -317,7 +317,9 @@ class EndToEndTest : public QuicTestWithParam<TestParams> {
     AddToCache("/bar", 200, kBarResponseBody);
   }
 
-  ~EndToEndTest() override { RecycleUnusedPort(server_address_.port()); }
+  ~EndToEndTest() override {
+    net_util::RecycleUnusedPort(server_address_.port());
+  }
 
   virtual void CreateClientWithWriter() {
     client_.reset(CreateQuicClient(client_writer_));

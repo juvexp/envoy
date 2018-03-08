@@ -160,7 +160,7 @@ class CommonCertSetsQUIC : public CommonCertSets {
   CommonCertSetsQUIC() {}
   ~CommonCertSetsQUIC() override {}
 
-  friend QuicSingleton<CommonCertSetsQUIC>;
+  friend QuicSingletonFriend<CommonCertSetsQUIC>;
   DISALLOW_COPY_AND_ASSIGN(CommonCertSetsQUIC);
 };
 

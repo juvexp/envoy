@@ -2222,7 +2222,6 @@ TEST_P(QuicSentPacketManagerTest, NegotiateNoMinTLPFromOptionsAtClient) {
 
 TEST_P(QuicSentPacketManagerTest, NegotiateIETFTLPFromOptionsAtServer) {
   SetQuicReloadableFlag(quic_max_ack_delay2, true);
-  SetQuicReloadableFlag(quic_min_rtt_ack_delay, true);
   QuicConfig config;
   QuicTagVector options;
 
@@ -2248,7 +2247,6 @@ TEST_P(QuicSentPacketManagerTest, NegotiateIETFTLPFromOptionsAtServer) {
 
 TEST_P(QuicSentPacketManagerTest, NegotiateIETFTLPFromOptionsAtClient) {
   SetQuicReloadableFlag(quic_max_ack_delay2, true);
-  SetQuicReloadableFlag(quic_min_rtt_ack_delay, true);
   QuicConfig client_config;
   QuicTagVector options;
 

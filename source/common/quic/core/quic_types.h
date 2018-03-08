@@ -79,8 +79,16 @@ enum QuicAsyncStatus {
 enum WriteStatus {
   WRITE_STATUS_OK,
   WRITE_STATUS_BLOCKED,
+  // To make the IsError(WriteStatus) function work properly:
+  // - Non-errors MUST be added before WRITE_STATUS_ERROR.
+  // - Errors MUST be added after WRITE_STATUS_ERROR.
   WRITE_STATUS_ERROR,
+  WRITE_STATUS_MSG_TOO_BIG,
 };
+
+inline bool IsError(WriteStatus status) {
+  return status >= WRITE_STATUS_ERROR;
+}
 
 // A struct used to return the result of write calls including either the number
 // of bytes written or the error code, depending upon the status.

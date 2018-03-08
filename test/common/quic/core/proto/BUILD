@@ -6,7 +6,7 @@ package_group(
     packages = [
         "//gfe/cluster_broker/...",
         "//gfe/gfe2/...",
-        "//source/common/quic/...",
+        "//gfe/quic/...",
     ],
 )
 

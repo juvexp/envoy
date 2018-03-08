@@ -135,13 +135,11 @@ void QuicSentPacketManager::SetFromConfig(const QuicConfig& config) {
     min_rto_timeout_ = QuicTime::Delta::Zero();
   }
   if (GetQuicReloadableFlag(quic_max_ack_delay2) &&
-      GetQuicReloadableFlag(quic_min_rtt_ack_delay) &&
       config.HasClientSentConnectionOption(kMAD4, perspective_)) {
     QUIC_FLAG_COUNT_N(gfe2_reloadable_flag_quic_max_ack_delay2, 3, 4);
     ietf_style_tlp_ = true;
   }
   if (GetQuicReloadableFlag(quic_max_ack_delay2) &&
-      GetQuicReloadableFlag(quic_min_rtt_ack_delay) &&
       config.HasClientSentConnectionOption(kMAD5, perspective_)) {
     QUIC_FLAG_COUNT_N(gfe2_reloadable_flag_quic_max_ack_delay2, 4, 4);
     ietf_style_2x_tlp_ = true;

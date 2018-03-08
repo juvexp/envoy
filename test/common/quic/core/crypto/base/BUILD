@@ -4,12 +4,12 @@
 # Primarily this consists of reimplementing existing Chromium crypto/ APIs in
 # google3.
 
-package(default_visibility = ["//source/common/quic/core/crypto/base:quic_crypto"])
+package(default_visibility = [":quic_crypto"])
 
 package_group(
     name = "quic_crypto",
     packages = [
-        "//source/common/quic/core/crypto",
+        "//gfe/quic/core/crypto",
     ],
 )
 
@@ -20,7 +20,7 @@ envoy_cc_test(
         "//source/common/quic/core/crypto/base:hkdf",
         "//base",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//strings",
         "//testing/base/public:gunit_main",
     ],
@@ -34,7 +34,7 @@ envoy_cc_test(
         "//source/common/quic/core/crypto/base:hmac",
         "//base",
         "//source/common/quic/platform/api:quic_string_lib",
-        "//source/common/quic/platform/api:quic_test_lib",
+        "//test/common/quic/platform/api:quic_test_lib",
         "//strings",
         "//testing/base/public:gunit_main",
         "//third_party/absl/strings",

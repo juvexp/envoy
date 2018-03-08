@@ -280,7 +280,7 @@ void QuicStream::WriteOrBufferData(
       QUIC_BUG << "Write too many data via stream " << id_;
       CloseConnectionWithDetails(
           QUIC_STREAM_LENGTH_OVERFLOW,
-          StrCat("Write too many data via stream ", id_));
+          absl::StrCat("Write too many data via stream ", id_));
       return;
     }
     send_buffer_.SaveStreamData(&iov, 1, 0, data.length());
@@ -376,8 +376,9 @@ QuicConsumedData QuicStream::WritevData(const struct iovec* iov,
       kMaxStreamLength - send_buffer_.stream_offset() < write_length) {
     QUIC_FLAG_COUNT_N(gfe2_reloadable_flag_quic_stream_too_long, 2, 5);
     QUIC_BUG << "Write too many data via stream " << id_;
-    CloseConnectionWithDetails(QUIC_STREAM_LENGTH_OVERFLOW,
-                               StrCat("Write too many data via stream ", id_));
+    CloseConnectionWithDetails(
+        QUIC_STREAM_LENGTH_OVERFLOW,
+        absl::StrCat("Write too many data via stream ", id_));
     return consumed_data;
   }
 
@@ -438,7 +439,7 @@ QuicConsumedData QuicStream::WriteMemSlices(QuicMemSliceSpan span, bool fin) {
         QUIC_BUG << "Write too many data via stream " << id_;
         CloseConnectionWithDetails(
             QUIC_STREAM_LENGTH_OVERFLOW,
-            StrCat("Write too many data via stream ", id_));
+            absl::StrCat("Write too many data via stream ", id_));
         return consumed_data;
       }
       OnDataBuffered(offset, consumed_data.bytes_consumed, nullptr);

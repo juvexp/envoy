@@ -479,11 +479,6 @@ class MockQuicConnection : public QuicConnection {
   bool ReallySendControlFrame(const QuicFrame& frame) {
     return QuicConnection::SendControlFrame(frame);
   }
-  void ReallySendGoAway(QuicErrorCode error,
-                        QuicStreamId last_good_stream_id,
-                        const string& reason) {
-    QuicConnection::SendGoAway(error, last_good_stream_id, reason);
-  }
 
   void ReallySendConnectivityProbingPacket(
       QuicPacketWriter* probing_writer,

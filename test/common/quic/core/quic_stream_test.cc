@@ -468,13 +468,9 @@ TEST_F(QuicStreamTest, StopReadingSendsFlowControl) {
   EXPECT_CALL(*connection_,
               CloseConnection(QUIC_FLOW_CONTROL_RECEIVED_TOO_MUCH_DATA, _, _))
       .Times(0);
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_))
-        .Times(AtLeast(1))
-        .WillRepeatedly(Invoke(this, &QuicStreamTest::ClearControlFrame));
-  } else {
-    EXPECT_CALL(*connection_, SendWindowUpdate(_, _)).Times(AtLeast(1));
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_))
+      .Times(AtLeast(1))
+      .WillRepeatedly(Invoke(this, &QuicStreamTest::ClearControlFrame));
 
   QuicString data(1000, 'x');
   for (QuicStreamOffset offset = 0;
@@ -985,8 +981,8 @@ TEST_F(QuicStreamTest, WriteMemSlices) {
   }
   char data[1024];
   std::vector<std::pair<char*, size_t>> buffers;
-  buffers.push_back(make_pair(data, QUIC_ARRAYSIZE(data)));
-  buffers.push_back(make_pair(data, QUIC_ARRAYSIZE(data)));
+  buffers.push_back(std::make_pair(data, QUIC_ARRAYSIZE(data)));
+  buffers.push_back(std::make_pair(data, QUIC_ARRAYSIZE(data)));
   QuicTestMemSliceVector vector1(buffers);
   QuicTestMemSliceVector vector2(buffers);
   QuicMemSliceSpan span1 = vector1.span();
@@ -1051,7 +1047,7 @@ TEST_F(QuicStreamTest, WriteMemSlicesReachStreamLimit) {
   QuicStreamPeer::SetStreamBytesWritten(kMaxStreamLength - 5u, stream_);
   char data[5];
   std::vector<std::pair<char*, size_t>> buffers;
-  buffers.push_back(make_pair(data, arraysize(data)));
+  buffers.push_back(std::make_pair(data, arraysize(data)));
   QuicTestMemSliceVector vector1(buffers);
   QuicMemSliceSpan span1 = vector1.span();
   EXPECT_CALL(*session_, WritevData(_, _, _, _, _))
@@ -1064,7 +1060,7 @@ TEST_F(QuicStreamTest, WriteMemSlicesReachStreamLimit) {
   EXPECT_EQ(5u, consumed.bytes_consumed);
 
   std::vector<std::pair<char*, size_t>> buffers2;
-  buffers2.push_back(make_pair(data, 1u));
+  buffers2.push_back(std::make_pair(data, 1u));
   QuicTestMemSliceVector vector2(buffers);
   QuicMemSliceSpan span2 = vector2.span();
   EXPECT_CALL(*connection_, CloseConnection(QUIC_STREAM_LENGTH_OVERFLOW, _, _));
@@ -1226,12 +1222,8 @@ TEST_F(QuicStreamTest, MarkConnectionLevelWriteBlockedOnWindowUpdateFrame) {
 
   EXPECT_CALL(*session_, WritevData(_, _, _, _, _))
       .WillRepeatedly(Invoke(MockQuicSession::ConsumeData));
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_))
-        .WillOnce(Invoke(this, &QuicStreamTest::ClearControlFrame));
-  } else {
-    EXPECT_CALL(*connection_, SendBlocked(stream_->id()));
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_))
+      .WillOnce(Invoke(this, &QuicStreamTest::ClearControlFrame));
   QuicString data(1024, '.');
   stream_->WriteOrBufferData(data, false, nullptr);
   EXPECT_FALSE(HasWriteBlockedStreams());
@@ -1262,12 +1254,8 @@ TEST_F(QuicStreamTest,
   QuicString data(kSmallWindow, '.');
   EXPECT_CALL(*session_, WritevData(_, _, _, _, _))
       .WillRepeatedly(Invoke(MockQuicSession::ConsumeData));
-  if (session_->use_control_frame_manager()) {
-    EXPECT_CALL(*connection_, SendControlFrame(_))
-        .WillOnce(Invoke(this, &QuicStreamTest::ClearControlFrame));
-  } else {
-    EXPECT_CALL(*connection_, SendBlocked(stream_->id()));
-  }
+  EXPECT_CALL(*connection_, SendControlFrame(_))
+      .WillOnce(Invoke(this, &QuicStreamTest::ClearControlFrame));
   stream_->WriteOrBufferData(data, false, nullptr);
   EXPECT_FALSE(HasWriteBlockedStreams());
 

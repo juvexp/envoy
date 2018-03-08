@@ -36,7 +36,7 @@ class DefaultRandom : public QuicRandom {
   DefaultRandom() {}
   ~DefaultRandom() override {}
 
-  friend QuicSingleton<DefaultRandom>;
+  friend QuicSingletonFriend<DefaultRandom>;
   DISALLOW_COPY_AND_ASSIGN(DefaultRandom);
 };
 

@@ -1,13 +1,13 @@
 # Description:
 #   Implementation of HTTP/2's HPACK compression (RFC7541).
 
-package(default_visibility = ["//source/common/quic/spdy_utils/core/hpack:internal"])
+package(default_visibility = [":internal"])
 
 package_group(
     name = "internal",
     packages = [
-        "//source/common/quic/http/...",
-        "//source/common/quic/spdy_utils/...",
+        "//gfe/quic/http/...",
+        "//gfe/spdy/...",
     ],
 )
 
@@ -29,7 +29,7 @@ envoy_cc_test(
         "//gfe/http2/hpack/decoder:hpack_decoder_state_lib",
         "//gfe/http2/hpack/decoder:hpack_decoder_tables_lib",
         "//gfe/http2/hpack/tools:hpack_block_builder_lib",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        "//test/common/quic/spdy_utils/core:spdy_test_utils_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_utils_lib",
         "//testing/base/public:gunit_main",
@@ -101,7 +101,7 @@ envoy_cc_test(
         "//source/common/quic/spdy_utils/core/hpack:hpack_decoder_adapter_lib",
         "//source/common/quic/spdy_utils/core/hpack:hpack_lib",
         "//base",
-        "//source/common/quic/spdy_utils/core:spdy_test_utils_lib",
+        "//test/common/quic/spdy_utils/core:spdy_test_utils_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_lib",
         "//testing/base/public:gunit_main",
         "//util/random:random_no_openssl",
