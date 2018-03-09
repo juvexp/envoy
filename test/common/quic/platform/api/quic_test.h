@@ -15,7 +15,7 @@
 #ifndef GFE_QUIC_PLATFORM_API_QUIC_TEST_H_
 #define GFE_QUIC_PLATFORM_API_QUIC_TEST_H_
 
-#include "common/quic/platform/impl/quic_test_impl.h"
+#include "test/common/quic/platform/impl/quic_test_impl.h"
 
 using QuicFlagSaver = QuicFlagSaverImpl;
 

@@ -57,7 +57,7 @@ envoy_cc_test_library(
         "quic_test.h",
     ],
     deps = [
-        "//gfe/quic/platform/impl:quic_test_impl_lib",
+        "//test/common/quic/platform/impl:quic_test_impl_lib",
     ],
 )
 
