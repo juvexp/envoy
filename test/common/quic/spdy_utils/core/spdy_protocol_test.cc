@@ -24,7 +24,7 @@
 #include "common/quic/spdy_utils/core/spdy_bitmasks.h"
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
 #include "common/quic/spdy_utils/platform/api/spdy_flags.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "testing/base/public/test_utils.h"
 
 namespace gfe_spdy {

@@ -34,7 +34,7 @@
 #include "common/quic/spdy_utils/platform/api/spdy_ptr_util.h"
 #include "strings/cord.h"
 #include "testing/base/public/googletest.h"  // for FLAGS_test_random_seed
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/mt_random.h"
 
 namespace gfe_spdy {

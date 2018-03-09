@@ -18,7 +18,7 @@
 #include "base/macros.h"
 #include "common/quic/core/quic_crypto_server_stream.h"
 #include "common/quic/core/quic_time_wait_list_manager.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_quic {
 namespace test {

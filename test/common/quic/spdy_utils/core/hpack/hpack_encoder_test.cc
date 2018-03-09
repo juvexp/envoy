@@ -19,8 +19,8 @@
 
 #include "base/arena.h"
 #include "common/quic/spdy_utils/core/hpack/hpack_huffman_table.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "util/random/acmrandom.h"
 
 namespace gfe_spdy {

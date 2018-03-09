@@ -31,7 +31,7 @@ struct QUIC_EXPORT_PRIVATE QuicPathChallengeFrame : public QuicControlFrame {
   QuicPathChallengeFrame();
   QuicPathChallengeFrame(QuicControlFrameId control_frame_id,
                          const QuicPathFrameBuffer& data_buff);
-  ~QuicPathChallengeFrame() {}
+  ~QuicPathChallengeFrame();
 
   friend QUIC_EXPORT_PRIVATE std::ostream& operator<<(
       std::ostream& os,

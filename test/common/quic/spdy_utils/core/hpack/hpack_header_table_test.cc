@@ -23,7 +23,7 @@
 #include "common/quic/spdy_utils/core/hpack/hpack_constants.h"
 #include "common/quic/spdy_utils/core/hpack/hpack_entry.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 

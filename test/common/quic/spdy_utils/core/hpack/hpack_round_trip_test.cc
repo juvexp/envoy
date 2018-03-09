@@ -26,7 +26,7 @@
 #include "common/quic/spdy_utils/core/hpack/hpack_encoder.h"
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/mt_random.h"
 
 namespace gfe_spdy {

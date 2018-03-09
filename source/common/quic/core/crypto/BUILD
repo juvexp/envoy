@@ -1,22 +1,17 @@
-# Description:
-#   Code for QUIC crypto (see go/quic) which is either shared between
-#   chrome-gfe or to-be-opensourced.
+licenses(["notice"])  # Apache 2
 
-package_group(
-    name = "internal",
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//source/common/quic/...",
-        "//gfe/test_tools/...",
-        "//net/hostdatapath/common/protocols",
-        "//video/streaming/quic",
-    ],
+
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
 
-default_visibility = [":internal"]
+envoy_package()
 
-package(default_visibility = default_visibility)
 
 envoy_cc_library(
     name = "crypto_handshake_lib",
@@ -110,7 +105,6 @@ envoy_cc_library(
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//third_party/absl/memory",
         "//third_party/openssl:crypto",
         "//third_party/openssl:ssl",
         "//third_party/zlib:zlibonly",

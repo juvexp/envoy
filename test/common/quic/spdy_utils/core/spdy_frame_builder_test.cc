@@ -19,7 +19,7 @@
 #include "common/quic/spdy_utils/core/array_output_buffer.h"
 #include "common/quic/spdy_utils/core/spdy_framer.h"
 #include "common/quic/spdy_utils/core/spdy_protocol.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 

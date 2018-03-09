@@ -34,9 +34,9 @@
 #include "common/quic/platform/api/quic_string_utils.h"
 #include "common/quic/platform/api/quic_test_random.h"
 #include "common/quic/platform/api/quic_text_utils.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 #include "testing/base/public/googletest.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 using ::testing::AssertionResult;
 using ::testing::Combine;

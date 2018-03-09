@@ -1,20 +1,17 @@
-# Copyright 2009 Google Inc. All Rights Reserved.
-# Author: fenix@google.com (Roberto Peon)
-#
-# Package:
-#  gfe/spdy/core
-#
-# Description
-#   This is the reference implementation of the HTTP/2 protocol (its framing,
-#   to be more accurate). It is replicated in Chromium source tree and in that
-#   sense is shared between Google3 and Chromium. It is intended to go under
-#   net/spdy in the near future, but for now has to live in the gfe tree.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [
-    "//gfe/gfe2:gfe2_internal",
-    "//source/common/quic:__subpackages__",
-    "//source/common/quic/spdy_utils:__subpackages__",
-])
+
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
+)
+
+envoy_package()
+
 
 envoy_cc_library(
     name = "http2_deframer_lib",
@@ -92,7 +89,6 @@ envoy_cc_library(
         "//source/common/quic/spdy_utils/platform/api:spdy_string_utils_lib",
         "//strings",
         "//testing/production_stub/public:gunit_prod",
-        "//third_party/absl/strings",
         "//util/gtl:lazy_static_ptr",
         "//util/task:status",
     ],
@@ -108,7 +104,6 @@ envoy_cc_library(
         "//source/common/quic/spdy_utils/platform/api:spdy_string_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_piece_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_utils_lib",
-        "//third_party/absl/container:inlined_vector",
         "//util/gtl:inlined_vector",
     ],
 )

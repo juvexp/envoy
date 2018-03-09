@@ -17,8 +17,8 @@
 // Tests of QuicHttpSettings.
 
 #include "test/common/quic/http/tools/quic_http_gunit_helpers.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 using ::testing::AssertionResult;
 using ::testing::AssertionSuccess;

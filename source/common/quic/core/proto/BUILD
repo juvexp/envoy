@@ -1,18 +1,17 @@
-# Description:
-#   Protobufs used in QUIC.
+licenses(["notice"])  # Apache 2
 
-package_group(
-    name = "internal",
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//source/common/quic/...",
-    ],
+
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
 
-package(
-    default_hdrs_check = "strict",
-)
+envoy_package()
+
 
 proto_library(
     name = "cached_network_parameters_proto",

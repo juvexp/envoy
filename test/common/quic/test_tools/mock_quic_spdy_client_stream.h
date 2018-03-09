@@ -19,7 +19,7 @@
 #include "common/quic/core/quic_header_list.h"
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/core/quic_spdy_client_stream.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_quic {
 namespace test {

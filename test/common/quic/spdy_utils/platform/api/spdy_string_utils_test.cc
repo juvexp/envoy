@@ -17,7 +17,7 @@
 #include <cstdint>
 
 #include "common/quic/spdy_utils/platform/api/spdy_string_piece.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 namespace test {

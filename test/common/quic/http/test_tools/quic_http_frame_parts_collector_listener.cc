@@ -15,7 +15,7 @@
 #include "test/common/quic/http/test_tools/quic_http_frame_parts_collector_listener.h"
 
 #include "base/logging.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

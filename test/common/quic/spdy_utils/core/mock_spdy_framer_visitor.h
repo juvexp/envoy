@@ -25,7 +25,7 @@
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
 #include "common/quic/spdy_utils/platform/api/spdy_ptr_util.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string_piece.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_spdy {
 

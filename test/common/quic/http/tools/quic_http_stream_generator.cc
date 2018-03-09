@@ -263,7 +263,7 @@ class BaseSerializer : public SerializerInterface {
       SerializeOneDataFrame(stream_id, prefix, false /* end_stream */);
       data.remove_prefix(data_frame_limit_);
     }
-    if (data.size() > 0 || end_stream) {
+    if (!data.empty() || end_stream) {
       SerializeOneDataFrame(stream_id, data, end_stream);
     }
   }

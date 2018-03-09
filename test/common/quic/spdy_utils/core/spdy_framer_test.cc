@@ -40,8 +40,8 @@
 #include "common/quic/spdy_utils/platform/api/spdy_string.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string_utils.h"
 #include "strings/cord.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "testing/base/public/mock-log.h"
 #include "testing/base/public/test_utils.h"
 

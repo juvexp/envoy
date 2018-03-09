@@ -1,24 +1,17 @@
-# Description:
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-package_group(
-    name = "internal",
-
-    # If you are adding a package to this list, please make sure to also update
-    # _quic_test_patterns in
-    # //depot/google3/gfe/tools/continuous_builds/gfe.blueprint otherwise you
-    # risk build breakage.
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//gfe/quic/...",
-        "//gfe/tools/...",
-        "//net/grpc/internal/src/core/quic/...",
-        "//third_party/pcc_quic/...",
-        "//video/streaming/quic/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_test(
     name = "quic_ref_counted_test",
@@ -26,7 +19,6 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/platform/api:quic_ref_counted_lib",
         ":quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -38,8 +30,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
         ":quic_test_lib",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/strings",
     ],
 )
 
@@ -49,7 +39,6 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/platform/api:quic_lru_cache_lib",
         ":quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -60,8 +49,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         ":quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/strings",
     ],
 )
 
@@ -93,7 +80,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_hostname_utils_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         ":quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -104,7 +90,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         ":quic_test_lib",
         "//source/common/quic/platform/api:quic_url_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -114,7 +99,6 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/platform/api:quic_endian_lib",
         ":quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -136,7 +120,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_mem_slice_lib",
         ":quic_test_lib",
         "//source/common/quic/core:quic_simple_buffer_allocator_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -161,7 +144,6 @@ envoy_cc_test(
         ":quic_test_mem_slice_vector_lib",
         "//source/common/quic/core:quic_simple_buffer_allocator_lib",
         "//source/common/quic/core:quic_stream_send_buffer_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -172,7 +154,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_str_cat_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//source/common/quic/platform/api:quic_string_utils_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -182,6 +163,5 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/platform/api:quic_singleton_lib",
         ":quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )

@@ -1,6 +1,17 @@
-# Test-only utilities and their tests.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = ["//gfe/quic/http:gfe_quic"])
+
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
+)
+
+envoy_package()
+
 
 # Libraries
 
@@ -25,7 +36,6 @@ envoy_cc_test_library(
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//strings",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -46,7 +56,6 @@ envoy_cc_test_library(
         "//test/common/quic/http/decoder:quic_http_frame_decoder_listener_test_util_lib",
         "//test/common/quic/http/tools:quic_http_random_decoder_test_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -64,7 +73,6 @@ envoy_cc_test_library(
         "//source/common/quic/http:quic_http_constants_lib",
         "//source/common/quic/http:quic_http_structures_lib",
         "//test/common/quic/http/tools:quic_http_random_decoder_test_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -80,7 +88,6 @@ envoy_cc_test(
         ":quic_http_frame_parts_lib",
         "//base",
         "//test/common/quic/http/tools:quic_http_random_decoder_test_lib",
-        "//testing/base/public:gunit_main",
         "//util/random/utils:test_random_seed_environment",
     ],
 )

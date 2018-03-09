@@ -17,7 +17,7 @@
 #include "common/quic/spdy_utils/core/spdy_protocol.h"
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
 #include "testing/base/public/benchmark.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "testing/base/public/test_utils.h"
 
 namespace gfe_spdy {

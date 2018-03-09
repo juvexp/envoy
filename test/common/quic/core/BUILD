@@ -1,30 +1,17 @@
-# Description:
-#   Code for QUIC (see go/quic) which is used in production, either in
-#   the GFE, gRPC or Chrome and which is shared between them.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
-load("//tools/build_rules:build_test.bzl", "build_test")
-
-package_group(
-    name = "internal",
-
-    # If you are adding a package to this list, please make sure to also update
-    # _quic_test_patterns in
-    # //depot/google3/gfe/tools/continuous_builds/gfe.blueprint otherwise you
-    # risk build breakage.
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//gfe/quic/...",
-        "//gfe/test_tools/...",
-        "//gfe/tools/...",
-        "//net/hostdatapath/common/protocols",
-        "//third_party/pcc_quic/...",
-        "//video/streaming/quic",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_test(
     name = "host_port_pair_test",
@@ -38,7 +25,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -52,7 +38,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_estimate_memory_usage_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -65,7 +50,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_time_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:mock_clock",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -77,7 +61,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_one_block_arena_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -89,7 +72,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_containers_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -102,7 +84,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_bandwidth_lib",
         "//source/common/quic/core:quic_time_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -114,7 +95,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -125,7 +105,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_alarm_lib",
         "//base",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -137,7 +116,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_flags_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -148,7 +126,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_tag_lib",
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -158,7 +135,6 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core:quic_error_codes_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -170,7 +146,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -183,7 +158,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -196,7 +170,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -207,7 +180,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_packets_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -220,7 +192,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -238,7 +209,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_config_peer",
         "//test/common/quic/test_tools:quic_sent_packet_manager_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -250,7 +220,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_sustained_bandwidth_recorder_lib",
         "//source/common/quic/core:quic_time_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -285,7 +254,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:simple_data_producer",
         "//test/common/quic/test_tools:simple_quic_framer",
         "//test/common/quic/test_tools:simple_session_notifier_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -297,7 +265,6 @@ envoy_cc_test(
         "//gfe/gfe2/test_tools:includes",
         "//test/common/quic/platform/api:quic_test_lib",
         "//gfe/quic/platform/impl:quic_epoll_clock_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -309,7 +276,6 @@ envoy_cc_test(
         "//gfe/gfe2/test_tools:includes",
         "//source/common/quic/core/crypto:quic_random_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -320,7 +286,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_connection_stats_lib",
         "//source/common/quic/core:quic_received_packet_manager_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -331,7 +296,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_packets_lib",
         "//source/common/quic/core:quic_simple_buffer_allocator_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -343,7 +307,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_arraysize_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -358,7 +321,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_flow_controller_peer",
         "//test/common/quic/test_tools:quic_sent_packet_manager_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -376,7 +338,6 @@ envoy_cc_test(
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_config_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -401,7 +362,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_stream_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -428,7 +388,6 @@ envoy_cc_test(
         "//source/common/quic/spdy_utils/core:spdy_alt_svc_wire_format_lib",
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
         "//test/common/quic/spdy_utils/core:spdy_test_utils_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -460,7 +419,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_sustained_bandwidth_recorder_peer",
         "//test/common/quic/test_tools:quic_test_utils",
         "//source/common/quic/tools:quic_simple_server_session_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -473,7 +431,6 @@ envoy_cc_test(
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -506,7 +463,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_stream_send_buffer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
         "//source/common/quic/spdy_utils/core:spdy_framer_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -535,7 +491,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_stream_peer",
         "//test/common/quic/test_tools:quic_stream_send_buffer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -552,7 +507,6 @@ envoy_cc_test(
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_stream_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -567,7 +521,6 @@ envoy_cc_test(
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:fake_proof_source",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -586,7 +539,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_stream_sequencer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -604,7 +556,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:mock_clock",
         "//test/common/quic/test_tools:quic_stream_sequencer_buffer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -618,7 +569,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -644,7 +594,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_stream_peer",
         "//test/common/quic/test_tools:quic_stream_sequencer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -665,7 +614,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_framer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
         "//test/common/quic/test_tools:simple_data_producer",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -687,7 +635,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_framer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
         "//test/common/quic/test_tools:simple_data_producer",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -710,7 +657,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_packet_creator_peer",
         "//test/common/quic/test_tools:quic_test_utils",
         "//test/common/quic/test_tools:simple_data_producer",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -734,7 +680,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_test_utils",
         "//test/common/quic/test_tools:simple_data_producer",
         "//test/common/quic/test_tools:simple_quic_framer",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -757,8 +702,6 @@ envoy_cc_test(
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
         "//test/common/quic/test_tools:quic_time_wait_list_manager_peer",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/time",
     ],
 )
 
@@ -775,7 +718,6 @@ envoy_cc_test(
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_stream_send_buffer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -788,7 +730,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -811,7 +752,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:fake_proof_source",
         "//test/common/quic/test_tools:quic_crypto_server_config_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -834,8 +774,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_packet_creator_peer",
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/base",
     ],
 )
 
@@ -858,7 +796,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_stream_sequencer_peer",
         "//test/common/quic/test_tools:quic_test_utils",
         "//test/common/quic/test_tools:simple_quic_framer",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -881,7 +818,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -902,7 +838,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_client_promised_info_peer",
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -920,7 +855,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:mock_quic_client_promised_info",
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -935,7 +869,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -958,7 +891,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//test/common/quic/test_tools:quic_crypto_server_config_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -990,7 +922,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_test_utils",
         "//test/common/quic/test_tools:quic_time_wait_list_manager_peer",
         "//source/common/quic/tools:quic_simple_server_session_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -1005,7 +936,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:mock_clock",
         "//test/common/quic/test_tools:quic_buffered_packet_store_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -1019,7 +949,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_flags_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -1030,7 +959,6 @@ envoy_cc_test(
         "//source/common/quic/core:packet_number_indexed_queue_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -1084,7 +1012,6 @@ envoy_cc_test_library(
         "//source/common/quic/tools:quic_server_lib",
         "//source/common/quic/tools:quic_simple_server_session_lib",
         "//net/util",
-        "//testing/base/public:gunit_main",
         "//util/time:clock",
     ],
 )

@@ -1371,6 +1371,39 @@ TEST_P(QuicConnectionTest, WriteOutOfOrderQueuedPackets) {
   }
 }
 
+TEST_P(QuicConnectionTest, DiscardQueuedPacketsAfterConnectionClose) {
+  // Regression test for b/74073386.
+  // When the flag is false, this test will trigger a use-after-free, which
+  // often means crashes, but not always, i.e. it can't be reliably tested.
+  SetQuicReloadableFlag(quic_fix_write_out_of_order_queued_packet_crash, true);
+  {
+    InSequence seq;
+    EXPECT_CALL(*send_algorithm_, OnPacketSent(_, _, _, _, _)).Times(1);
+    EXPECT_CALL(visitor_, OnConnectionClosed(_, _, _)).Times(1);
+  }
+
+  set_perspective(Perspective::IS_CLIENT);
+
+  writer_->SimulateNextPacketTooLarge();
+
+  // This packet write should fail, which should cause the connection to close
+  // after sending a connection close packet, then the failed packet should be
+  // queued.
+  connection_.SendStreamDataWithString(/*id=*/2, "foo", 0, NO_FIN);
+
+  EXPECT_FALSE(connection_.connected());
+  EXPECT_EQ(1u, connection_.NumQueuedPackets());
+
+  if (GetQuicReloadableFlag(quic_always_discard_packets_after_close)) {
+    EXPECT_EQ(0u, connection_.GetStats().packets_discarded);
+    connection_.OnCanWrite();
+    EXPECT_EQ(1u, connection_.GetStats().packets_discarded);
+  } else {
+    EXPECT_QUIC_BUG(connection_.OnCanWrite(),
+                    "Attempt to write packet:1 after:2");
+  }
+}
+
 TEST_P(QuicConnectionTest, ReceiveConnectivityProbingAtServer) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   set_perspective(Perspective::IS_SERVER);
@@ -4971,6 +5004,31 @@ TEST_P(QuicConnectionTest, SendWhenDisconnected) {
   EXPECT_CALL(*send_algorithm_, OnPacketSent(_, _, 1, _, _)).Times(0);
   connection_.SendPacket(ENCRYPTION_NONE, 1, packet, HAS_RETRANSMITTABLE_DATA,
                          false, false);
+}
+
+TEST_P(QuicConnectionTest, SendConnectivityProbingWhenDisconnected) {
+  EXPECT_TRUE(connection_.connected());
+  EXPECT_CALL(visitor_, OnConnectionClosed(QUIC_PEER_GOING_AWAY, _,
+                                           ConnectionCloseSource::FROM_SELF));
+  connection_.CloseConnection(QUIC_PEER_GOING_AWAY, "no reason",
+                              ConnectionCloseBehavior::SILENT_CLOSE);
+  EXPECT_FALSE(connection_.connected());
+  EXPECT_FALSE(connection_.CanWriteStreamData());
+
+  int num_packets_sent =
+      GetQuicReloadableFlag(quic_always_discard_packets_after_close) ? 0 : 1;
+  EXPECT_CALL(*send_algorithm_, OnPacketSent(_, _, 1, _, _))
+      .Times(num_packets_sent);
+
+  if (GetQuicReloadableFlag(quic_always_discard_packets_after_close)) {
+    EXPECT_QUIC_BUG(connection_.SendConnectivityProbingPacket(
+                        writer_.get(), connection_.peer_address()),
+                    "Not sending connectivity probing packet as connection is "
+                    "disconnected.");
+  } else {
+    connection_.SendConnectivityProbingPacket(writer_.get(),
+                                              connection_.peer_address());
+  }
 }
 
 TEST_P(QuicConnectionTest, PublicReset) {

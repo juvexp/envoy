@@ -25,7 +25,7 @@
 #include "common/quic/http/decoder/quic_http_decode_status.h"
 #include "common/quic/http/quic_http_constants.h"
 #include "testing/base/public/googletest.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 // It's rather time consuming to decode large buffers one at a time,
 // especially with the log level cranked up. So, by default we don't do
@@ -69,7 +69,7 @@ int QuicHttpRandomDecoderTest::BoostLoggingIfDefault(int target_level) {
   // the large string sizes, so we avoid that in general.
   int old_level = base::GetFlag(FLAGS_v);
   if (target_level > 0 && base::GetFlag(FLAGS_v) == 0 &&
-      base::GetFlag(FLAGS_vmodule) == "") {
+      base::GetFlag(FLAGS_vmodule).empty()) {
     base::SetFlag(&FLAGS_v, target_level);
     LOG(INFO) << "Overriding --v=0 for this test case, setting to "
               << base::GetFlag(FLAGS_v);

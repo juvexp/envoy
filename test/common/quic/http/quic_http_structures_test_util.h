@@ -19,7 +19,7 @@
 #include "test/common/quic/http/tools/quic_http_frame_builder.h"
 #include "common/quic/platform/api/quic_string.h"
 #include "common/quic/platform/api/quic_test_random.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

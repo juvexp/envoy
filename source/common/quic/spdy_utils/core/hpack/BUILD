@@ -1,23 +1,17 @@
-# Description:
-#   Implementation of HTTP/2's HPACK compression (RFC7541).
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-package_group(
-    name = "internal",
-    packages = [
-        "//source/common/quic/http/...",
-        "//source/common/quic/spdy_utils/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
 
-package_group(
-    name = "gfe2",
-    packages = [
-        "//gfe/gfe2/spdy/...",
-        "//gfe/gfe2/test_tools/fuzzing/http2/...",
-    ],
-)
+envoy_package()
+
 
 envoy_cc_library(
     name = "hpack_lib",

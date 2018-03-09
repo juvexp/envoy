@@ -21,8 +21,8 @@
 #include "common/quic/spdy_utils/core/hpack/hpack_constants.h"
 #include "common/quic/spdy_utils/core/hpack/hpack_output_stream.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string_utils.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 

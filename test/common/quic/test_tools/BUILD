@@ -1,36 +1,17 @@
-# Copyright 2012 Google Inc. All Rights Reserved.
-# Author: alyssar@google.com (Alyssa Wilk)
-#
-# Description:
-#   test tools for quic.
+licenses(["notice"])  # Apache 2
 
-package_group(
-    name = "internal",
 
-    # If you are adding a package to this list, please make sure to also update
-    # _quic_test_patterns in
-    # //depot/google3/gfe/tools/continuous_builds/gfe.blueprint otherwise you
-    # risk build breakage.
-    packages = [
-        "//borg/monitoring/b3m/...",
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//gfe/quic/...",
-        "//gfe/test_tools/...",
-        "//gfe/tools/...",
-        "//net/bandaid/internetto/wtrace/agent/...",
-        "//net/grpc/internal/src/core/quic/...",
-        "//net/grpc/internal/test/cpp/end2end/...",
-        "//third_party/pcc_quic/...",
-        "//video/streaming/quic/...",
-        "//video/streaming/testing/perf/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
 
-package(
-    default_testonly = 1,
-    default_visibility = [":internal"],
-)
+envoy_package()
+
 
 envoy_cc_test_library(
     name = "rtt_stats_peer",
@@ -374,7 +355,6 @@ envoy_cc_test_library(
         "//net/httpsconnection:file_cert_key_loader",
         "//net/httpsconnection:sslcertificateprovider",
         "//net/httpsconnection:sslconnectionbase",
-        "//testing/base/public:gunit_for_library",
         "//third_party/openssl:crypto",
     ],
 )
@@ -387,7 +367,6 @@ envoy_cc_test(
     deps = [
         ":quic_test_utils",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -488,7 +467,6 @@ envoy_cc_test_library(
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//source/common/quic/platform/api:quic_url_lib",
         "//source/common/quic/tools:quic_client_lib",
-        "//testing/base/public:gunit_for_library",
         "//third_party/openssl:crypto",
     ],
 )
@@ -615,7 +593,6 @@ envoy_cc_test_library(
         "//source/common/quic/core:quic_packets_lib",
         "//source/common/quic/core/crypto:crypto_handshake_lib",
         "//source/common/quic/tools:quic_server_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -632,7 +609,6 @@ envoy_cc_test_library(
         "//source/common/quic/core:quic_client_lib",
         "//source/common/quic/core:quic_header_list_lib",
         "//source/common/quic/core:quic_packets_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -648,7 +624,6 @@ envoy_cc_test_library(
         "//base",
         "//source/common/quic/core:quic_client_lib",
         "//source/common/quic/core:quic_packets_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -702,7 +677,6 @@ envoy_cc_test_library(
         "//source/common/quic/core:quic_connection_lib",
         "//source/common/quic/core:session_notifier_interface_lib",
         "//source/common/quic/platform/api:quic_map_util_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -713,7 +687,6 @@ envoy_cc_test(
         ":quic_test_utils",
         ":simple_session_notifier_lib",
         "//test/common/quic/platform/api:quic_test_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -759,7 +732,5 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/strings",
     ],
 )

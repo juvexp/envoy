@@ -20,7 +20,7 @@
 #include "common/quic/core/quic_config.h"
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/tools/quic_simple_dispatcher.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_quic {
 namespace test {

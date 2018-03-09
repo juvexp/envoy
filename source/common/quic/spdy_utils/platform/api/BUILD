@@ -1,14 +1,17 @@
-# Description:
-#     Platform independent API used in shared spdy code.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-package_group(
-    name = "internal",
-    packages = [
-        "//source/common/quic/spdy_utils/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_library(
     name = "spdy_estimate_memory_usage_lib",

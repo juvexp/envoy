@@ -22,7 +22,7 @@
 // (i.e. one file to be considered, not many).
 
 #include "gfe/gfe2/test_tools/failure.h"  // IWYU pragma: export
-#include "testing/base/public/gunit.h"    // IWYU pragma: keep
+#include "gtest/gtest.h"    // IWYU pragma: keep
                                           // For AssertionSuccess
 
 // TODO: Cleanup and move to gfe/gfe2/test_tools/failure.h.

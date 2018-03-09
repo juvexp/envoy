@@ -21,7 +21,7 @@
 #include "common/quic/platform/api/quic_str_cat.h"
 #include "common/quic/platform/api/quic_string_utils.h"
 #include "testing/base/public/googletest.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/mt_random.h"
 
 namespace gfe_quic {

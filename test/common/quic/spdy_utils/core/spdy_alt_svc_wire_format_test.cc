@@ -18,7 +18,7 @@
 #include "common/quic/spdy_utils/core/spdy_alt_svc_wire_format.h"
 
 #include "base/logging.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 #include "testing/base/public/test_utils.h"
 
 namespace gfe_spdy {

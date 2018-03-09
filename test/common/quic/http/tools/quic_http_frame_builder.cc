@@ -22,7 +22,7 @@
 #endif
 
 #include "common/quic/platform/api/quic_string_utils.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

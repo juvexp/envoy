@@ -1,12 +1,17 @@
-# Experimental HTTP/2 decoder.
-# Please put rules in lexical order by name within sections.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = ["//source/common/quic/http:gfe_quic"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
+)
 
-################################################################################
-# Libraries (i.e. production code).
+envoy_package()
+
 
 envoy_cc_library(
     name = "quic_http_altsvc_payload_decoder_lib",

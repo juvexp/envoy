@@ -1,17 +1,17 @@
-# Description:
-#   Code for QUIC congestion control (see go/quic for links to details) this
-#   will either be shared between chrome-gfe or to-be-opensourced.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-package_group(
-    name = "internal",
-    packages = [
-        "//gfe/gfe2/...",
-        "//source/common/quic/...",
-        "//third_party/pcc_quic/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_library(
     name = "windowed_filter_lib",

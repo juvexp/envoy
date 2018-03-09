@@ -19,7 +19,7 @@
 #include "base/logging.h"
 #include "test/common/quic/http/quic_http_structures_test_util.h"
 #include "common/quic/platform/api/quic_ptr_util.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

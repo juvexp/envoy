@@ -243,7 +243,7 @@ void QuicSentPacketManager::SetHandshakeConfirmed() {
   handshake_confirmed_ = true;
 }
 
-void QuicSentPacketManager::OnIncomingAck(const QuicAckFrame& ack_frame,
+bool QuicSentPacketManager::OnIncomingAck(const QuicAckFrame& ack_frame,
                                           QuicTime ack_receive_time) {
   DCHECK_LE(LargestAcked(ack_frame), unacked_packets_.largest_sent_packet());
   QuicByteCount prior_in_flight = unacked_packets_.bytes_in_flight();
@@ -253,8 +253,10 @@ void QuicSentPacketManager::OnIncomingAck(const QuicAckFrame& ack_frame,
   unacked_packets_.IncreaseLargestObserved(LargestAcked(ack_frame));
 
   HandleAckForSentPackets(ack_frame);
+  const bool acked_new_packet = !packets_acked_.empty();
   PostProcessAfterMarkingPacketHandled(ack_frame, ack_receive_time, rtt_updated,
                                        prior_in_flight);
+  return acked_new_packet;
 }
 
 void QuicSentPacketManager::PostProcessAfterMarkingPacketHandled(
@@ -1097,7 +1099,7 @@ void QuicSentPacketManager::OnAckRange(QuicPacketNumber start,
   }
 }
 
-void QuicSentPacketManager::OnAckFrameEnd(QuicTime ack_receive_time) {
+bool QuicSentPacketManager::OnAckFrameEnd(QuicTime ack_receive_time) {
   QuicByteCount prior_bytes_in_flight = unacked_packets_.bytes_in_flight();
   // Reverse packets_acked_ so that it is in ascending order.
   reverse(packets_acked_.begin(), packets_acked_.end());
@@ -1133,7 +1135,7 @@ void QuicSentPacketManager::OnAckFrameEnd(QuicTime ack_receive_time) {
     MarkPacketHandled(acked_packet.packet_number, info,
                       last_ack_frame_.ack_delay_time);
   }
-
+  const bool acked_new_packet = !packets_acked_.empty();
   PostProcessAfterMarkingPacketHandled(last_ack_frame_, ack_receive_time,
                                        rtt_updated_, prior_bytes_in_flight);
   // TODO: Move these two lines to PostProcessAfterMarkingPacketHandled
@@ -1142,6 +1144,8 @@ void QuicSentPacketManager::OnAckFrameEnd(QuicTime ack_receive_time) {
   // last_ack_frame_.
   last_ack_frame_.packets.RemoveUpTo(unacked_packets_.GetLeastUnacked());
   all_packets_acked_.Difference(0, unacked_packets_.GetLeastUnacked());
+
+  return acked_new_packet;
 }
 
 void QuicSentPacketManager::SetDebugDelegate(DebugDelegate* debug_delegate) {

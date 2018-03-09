@@ -21,7 +21,7 @@
 #include "common/quic/spdy_utils/core/spdy_framer.h"
 #include "common/quic/spdy_utils/core/spdy_protocol.h"
 #include "testing/base/public/googletest.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/mt_random.h"
 
 using ::gfe_spdy::SpdyFramer;

@@ -1,21 +1,17 @@
-# *EXPERIMENTAL* HTTP/2 encoder/decoder. Do NOT depend upon in production code.
+licenses(["notice"])  # Apache 2
 
-# Please put rules in lexical order by name within sections.
 
-package_group(
-    name = "gfe_quic",
-    packages = [
-        # Temporarily allow gfe2 and spdy access to all targets.
-        # TODO: Figure out which targets to expose.
-        "//gfe/gfe2/...",
-        "//gfe/quic/http/...",
-        "//gfe/spdy/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
 
-package(default_visibility = ["//gfe/quic/http:gfe_quic"])
-################################################################################
-# Libraries (i.e. production code).
+envoy_package()
+
 
 ################################################################################
 # Tests and test support.
@@ -28,7 +24,6 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/http:quic_http_constants_lib",
         "//base",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -62,7 +57,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_test_random_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//strings",
-        "//testing/base/public:gunit_main",
         "//util/random/utils:test_random_seed_environment",
     ],
 )
@@ -83,6 +77,5 @@ envoy_cc_test_library(
         "//test/common/quic/http/tools:quic_http_frame_builder_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_test_random_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )

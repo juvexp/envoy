@@ -1212,6 +1212,10 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   // gfe2_reloadable_flag_quic_server_early_version_negotiation.
   const bool negotiate_version_early_;
 
+  // Latched value of
+  // gfe2_reloadable_flag_quic_always_discard_packets_after_close.
+  const bool always_discard_packets_after_close_;
+
   DISALLOW_COPY_AND_ASSIGN(QuicConnection);
 };
 

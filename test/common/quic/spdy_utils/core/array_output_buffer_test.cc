@@ -14,8 +14,8 @@
 
 #include "common/quic/spdy_utils/core/array_output_buffer.h"
 
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 namespace test {

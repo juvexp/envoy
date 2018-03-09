@@ -91,7 +91,7 @@
 #include "test/common/quic/spdy_utils/core/spdy_protocol_test_utils.h"
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 namespace test {

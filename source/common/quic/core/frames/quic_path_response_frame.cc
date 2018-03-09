@@ -26,6 +26,8 @@ QuicPathResponseFrame::QuicPathResponseFrame(
   memcpy(data_buffer.data(), data_buff.data(), data_buffer.size());
 }
 
+QuicPathResponseFrame::~QuicPathResponseFrame() {}
+
 std::ostream& operator<<(std::ostream& os, const QuicPathResponseFrame& frame) {
   os << "{ control_frame_id: " << frame.control_frame_id
      << ", data: " << static_cast<unsigned>(frame.data_buffer[0]) << " "

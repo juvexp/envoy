@@ -29,7 +29,7 @@
 #include "test/common/quic/http/test_tools/quic_http_frame_parts_collector.h"
 #include "test/common/quic/http/tools/quic_http_frame_builder.h"
 #include "test/common/quic/http/tools/quic_http_random_decoder_test.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

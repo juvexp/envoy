@@ -1,6 +1,17 @@
-# Test-only utilities and their tests.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = ["//source/common/quic/http:gfe_quic"])
+
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
+)
+
+envoy_package()
+
 
 # Libraries
 

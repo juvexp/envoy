@@ -1,9 +1,17 @@
-# Description: Tools in support of http2 decoder/encoder.
-# Please put rules in lexical order by name within sections.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = ["//source/common/quic/http:gfe_quic"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
+)
+
+envoy_package()
+
 
 ################################################################################
 # Libraries.

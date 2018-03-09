@@ -40,7 +40,7 @@
 #include "test/common/quic/test_tools/mock_clock.h"
 #include "test/common/quic/test_tools/mock_quic_session_visitor.h"
 #include "test/common/quic/test_tools/mock_random.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 // EXPECT_QUIC_BUG is like EXPECT_DFATAL, except it ensures that no DFATAL
 // logging is skipped due to exponential backoff.

@@ -38,7 +38,7 @@
 #include "common/quic/platform/api/quic_string_piece.h"
 #include "common/quic/platform/api/quic_string_utils.h"
 #include "common/quic/platform/api/quic_text_utils.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 DEFINE_FLAG(uint64 /* allow-non-std-int */,
             random_decode_count,

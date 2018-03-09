@@ -1,9 +1,17 @@
-# Description: Tools in support of http2 decoder/encoder.
-# Please put rules in lexical order by name within sections.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = ["//gfe/quic/http:gfe_quic"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
+)
+
+envoy_package()
+
 
 ################################################################################
 # Libraries.
@@ -29,7 +37,6 @@ envoy_cc_test_library(
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//source/common/quic/platform/api:quic_string_utils_lib",
         "//strings",
-        "//third_party/absl/strings",
         "//util/regexp/re2",
         "//util/task:status",
         "//util/task:statusor",
@@ -44,7 +51,6 @@ envoy_cc_test(
     deps = [
         ":quic_http_frame_formatter_lib",
         "//base",
-        "//testing/base/public:gunit_main",
         "//util/random/utils:test_random_seed_environment",
     ],
 )
@@ -55,7 +61,6 @@ envoy_cc_test_library(
     deps = [
         "//base",
         "//gfe/gfe2/test_tools:failure_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -72,7 +77,6 @@ envoy_cc_test_library(
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//source/common/quic/platform/api:quic_string_utils_lib",
-        "//testing/base/public:gunit_for_library",
     ],
 )
 
@@ -84,7 +88,6 @@ envoy_cc_test(
     deps = [
         ":quic_http_frame_builder_lib",
         "//base",
-        "//testing/base/public:gunit_main",
         "//util/random/utils:test_random_seed_environment",
     ],
 )
@@ -138,7 +141,6 @@ cc_test_library(
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_test_random_lib",
-        "//testing/base/public:gunit_for_library",
         "//util/random:random_no_openssl",
         "//util/random/utils:test_random_seed_environment",
     ],
@@ -155,7 +157,6 @@ envoy_cc_test(
         "//source/common/quic/http/decoder:quic_http_decode_buffer_lib",
         "//source/common/quic/http/decoder:quic_http_decode_status_lib",
         "//source/common/quic/platform/api:quic_bug_tracker_lib",
-        "//testing/base/public:gunit_main",
         "//util/random:random_no_openssl",
         "//util/random/utils:test_random_seed_environment",
     ],
@@ -188,7 +189,6 @@ envoy_cc_test(
         "//base",
         "//source/common/quic/platform/api:quic_str_cat_lib",
         "//source/common/quic/platform/api:quic_string_utils_lib",
-        "//testing/base/public:gunit_main",
         "//util/random:random_no_openssl",
         "//util/random/utils:test_random_seed_environment",
     ],
@@ -232,7 +232,6 @@ envoy_cc_test(
         "//base",
         "//source/common/quic/spdy_utils/core:spdy_framer_lib",
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
-        "//testing/base/public:gunit_main",
         "//util/random:random_no_openssl",
         "//util/random/utils:test_random_seed_environment",
     ],

@@ -1,30 +1,17 @@
-# Description:
-#   Code for QUIC (see go/quic) which is used in production, either in
-#   the GFE, gRPC or Chrome and which is shared between them.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
-load("//tools/build_rules:build_test.bzl", "build_test")
-
-package_group(
-    name = "internal",
-
-    # If you are adding a package to this list, please make sure to also update
-    # _quic_test_patterns in
-    # //depot/google3/gfe/tools/continuous_builds/gfe.blueprint otherwise you
-    # risk build breakage.
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//source/common/quic/...",
-        "//gfe/test_tools/...",
-        "//gfe/tools/...",
-        "//net/hostdatapath/common/protocols",
-        "//third_party/pcc_quic/...",
-        "//video/streaming/quic",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_library(
     name = "quic_blocked_writer_interface_lib",

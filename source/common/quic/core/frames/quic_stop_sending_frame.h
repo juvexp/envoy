@@ -12,36 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GFE_QUIC_CORE_FRAMES_QUIC_PATH_RESPONSE_FRAME_H_
-#define GFE_QUIC_CORE_FRAMES_QUIC_PATH_RESPONSE_FRAME_H_
+#ifndef GFE_QUIC_CORE_FRAMES_QUIC_STOP_SENDING_FRAME_H_
+#define GFE_QUIC_CORE_FRAMES_QUIC_STOP_SENDING_FRAME_H_
 
-#include <memory>
 #include <ostream>
 
 #include "common/quic/core/frames/quic_control_frame.h"
-#include "common/quic/core/quic_types.h"
+#include "common/quic/core/quic_error_codes.h"
 
 namespace gfe_quic {
 
-// Size of the entire IETF Quic Path Response frame, including
-// type byte.
-const size_t kQuicPathResponseFrameSize = (kQuicPathFrameBufferSize + 1);
-
-struct QUIC_EXPORT_PRIVATE QuicPathResponseFrame : public QuicControlFrame {
-  QuicPathResponseFrame();
-  QuicPathResponseFrame(QuicControlFrameId control_frame_id,
-                        const QuicPathFrameBuffer& data_buff);
-  ~QuicPathResponseFrame();
+struct QUIC_EXPORT_PRIVATE QuicStopSendingFrame : public QuicControlFrame {
+  QuicStopSendingFrame();
+  QuicStopSendingFrame(QuicControlFrameId control_frame_id,
+                       QuicStreamId stream_id,
+                       uint16_t application_error_code);
 
   friend QUIC_EXPORT_PRIVATE std::ostream& operator<<(
       std::ostream& os,
-      const QuicPathResponseFrame& frame);
+      const QuicStopSendingFrame& frame);
 
-  QuicPathFrameBuffer data_buffer;
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(QuicPathResponseFrame);
+  QuicStreamId stream_id;
+  QuicApplicationErrorCode application_error_code;
 };
+
 }  // namespace gfe_quic
 
-#endif  // GFE_QUIC_CORE_FRAMES_QUIC_PATH_RESPONSE_FRAME_H_
+#endif  // GFE_QUIC_CORE_FRAMES_QUIC_STOP_SENDING_FRAME_H_

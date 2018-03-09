@@ -20,7 +20,7 @@
 #include "test/common/quic/http/quic_http_structures_test_util.h"
 #include "test/common/quic/http/tools/quic_http_gunit_helpers.h"
 #include "strings/escaping.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 using ::testing::AssertionFailure;
 using ::testing::AssertionResult;

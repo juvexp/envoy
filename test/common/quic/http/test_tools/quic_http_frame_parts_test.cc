@@ -15,7 +15,7 @@
 #include "test/common/quic/http/test_tools/quic_http_frame_parts.h"
 
 #include "testing/base/public/gunit-spi.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

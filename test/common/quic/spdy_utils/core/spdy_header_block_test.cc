@@ -17,8 +17,8 @@
 #include <utility>
 
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 using ::testing::ElementsAre;
 

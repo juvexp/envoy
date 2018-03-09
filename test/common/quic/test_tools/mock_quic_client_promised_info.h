@@ -20,7 +20,7 @@
 #include "base/macros.h"
 #include "common/quic/core/quic_client_promised_info.h"
 #include "common/quic/core/quic_packets.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_quic {
 namespace test {

@@ -1,11 +1,17 @@
-# *EXPERIMENTAL* HTTP/2 Endpoint: understands HTTP/2 at a level above decoding and encoding.
+licenses(["notice"])  # Apache 2
 
-# Please put rules in lexical order by name within sections.
 
-package(default_visibility = ["//source/common/quic/http:gfe_quic"])
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
+)
 
-################################################################################
-# Libraries (i.e. production code).
+envoy_package()
+
 
 ################################################################################
 # Tests and test support.

@@ -16,7 +16,7 @@
 
 #include <utility>
 
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 namespace test {

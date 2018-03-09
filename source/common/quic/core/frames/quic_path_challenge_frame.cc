@@ -26,6 +26,8 @@ QuicPathChallengeFrame::QuicPathChallengeFrame(
   memcpy(data_buffer.data(), data_buff.data(), data_buffer.size());
 }
 
+QuicPathChallengeFrame::~QuicPathChallengeFrame() {}
+
 std::ostream& operator<<(std::ostream& os,
                          const QuicPathChallengeFrame& frame) {
   os << "{ control_frame_id: " << frame.control_frame_id

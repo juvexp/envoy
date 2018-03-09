@@ -78,7 +78,6 @@ class QuicFramerPeer {
                                                QuicDataReader* reader,
                                                const uint8_t frame_type,
                                                QuicConnectionCloseFrame* frame);
-
   static bool ProcessIetfAckFrame(QuicFramer* framer,
                                   QuicDataReader* reader,
                                   uint8_t frame_type,
@@ -86,6 +85,12 @@ class QuicFramerPeer {
   static bool AppendIetfAckFrameAndTypeByte(QuicFramer* framer,
                                             const QuicAckFrame& frame,
                                             QuicDataWriter* writer);
+  static bool AppendIetfResetStreamFrame(QuicFramer* framer,
+                                         const QuicRstStreamFrame& frame,
+                                         QuicDataWriter* writer);
+  static bool ProcessIetfResetStreamFrame(QuicFramer* framer,
+                                          QuicDataReader* reader,
+                                          QuicRstStreamFrame* frame);
 
   // Add/remove IETF-Format padding.
   static bool AppendIetfPaddingFrame(QuicFramer* framer,
@@ -109,6 +114,15 @@ class QuicFramerPeer {
   static bool AppendIetfPathResponseFrameAndTypeByte(
       QuicFramer* framer,
       const QuicPathResponseFrame& frame,
+      QuicDataWriter* writer);
+
+  static bool ProcessIetfStopSendingFrame(
+      QuicFramer* framer,
+      QuicDataReader* reader,
+      QuicStopSendingFrame* stop_sending_frame);
+  static bool AppendIetfStopSendingFrameAndTypeByte(
+      QuicFramer* framer,
+      const QuicStopSendingFrame& stop_sending_frame,
       QuicDataWriter* writer);
 
  private:

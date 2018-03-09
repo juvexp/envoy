@@ -1,15 +1,17 @@
-# Description:
-#   Code describing QUIC frame types.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-package_group(
-    name = "internal",
-    packages = [
-        "//gfe/gfe2/...",
-        "//source/common/quic/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_library(
     name = "quic_frames_lib",
@@ -24,6 +26,7 @@ envoy_cc_library(
         "quic_path_response_frame.cc",
         "quic_ping_frame.cc",
         "quic_rst_stream_frame.cc",
+        "quic_stop_sending_frame.cc",
         "quic_stop_waiting_frame.cc",
         "quic_stream_frame.cc",
         "quic_window_update_frame.cc",
@@ -41,6 +44,7 @@ envoy_cc_library(
         "quic_path_response_frame.h",
         "quic_ping_frame.h",
         "quic_rst_stream_frame.h",
+        "quic_stop_sending_frame.h",
         "quic_stop_waiting_frame.h",
         "quic_stream_frame.h",
         "quic_window_update_frame.h",

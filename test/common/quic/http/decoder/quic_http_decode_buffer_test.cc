@@ -18,7 +18,7 @@
 
 #include "base/logging.h"
 #include "testing/base/public/googletest.h"  // for FLAGS_test_random_seed
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/acmrandom.h"
 
 namespace gfe_quic {

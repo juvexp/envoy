@@ -16,7 +16,7 @@
 #define GFE_QUIC_TEST_TOOLS_SIMPLE_SESSION_NOTIFIER_H_
 
 #include "common/quic/core/session_notifier_interface.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_quic {
 

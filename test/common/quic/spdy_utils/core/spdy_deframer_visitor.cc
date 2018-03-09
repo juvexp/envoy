@@ -31,7 +31,7 @@
 #include "common/quic/spdy_utils/platform/api/spdy_ptr_util.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string_piece.h"
 #include "strings/cord.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 using ::testing::AssertionFailure;
 using ::testing::AssertionResult;

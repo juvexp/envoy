@@ -1,17 +1,17 @@
-# Classes in this directory implement a common cryptographic API between
-# Chromium and the GFE so that QUIC crypto code can be written once.
-#
-# Primarily this consists of reimplementing existing Chromium crypto/ APIs in
-# google3.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":quic_crypto"])
 
-package_group(
-    name = "quic_crypto",
-    packages = [
-        "//gfe/quic/core/crypto",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_test(
     name = "hkdf_test",
@@ -22,7 +22,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//strings",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -36,7 +35,5 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//strings",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/strings",
     ],
 )

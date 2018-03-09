@@ -42,7 +42,7 @@
 #include "common/quic/platform/api/quic_reconstruct_object.h"
 #include "common/quic/platform/api/quic_string.h"
 #include "common/quic/platform/api/quic_string_piece.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 DEFINE_FLAG(uint64 /* allow-non-std-int */,
             random_decode_count,

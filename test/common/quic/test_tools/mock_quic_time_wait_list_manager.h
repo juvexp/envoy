@@ -16,7 +16,7 @@
 #define GFE_QUIC_TEST_TOOLS_MOCK_QUIC_TIME_WAIT_LIST_MANAGER_H_
 
 #include "common/quic/core/quic_time_wait_list_manager.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_quic {
 namespace test {

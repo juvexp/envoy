@@ -25,7 +25,7 @@
 #endif
 
 #include "base/macros.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 

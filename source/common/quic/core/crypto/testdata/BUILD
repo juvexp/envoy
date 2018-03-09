@@ -1,17 +1,17 @@
-package_group(
-    name = "internal",
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//source/common/quic/...",
-        "//net/grpc/internal/...",
-    ],
+licenses(["notice"])  # Apache 2
+
+
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
 
-package(
-    default_testonly = 1,
-    default_visibility = [":internal"],
-)
+envoy_package()
+
 
 filegroup(
     name = "testdata",

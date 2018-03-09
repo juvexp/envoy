@@ -1,15 +1,17 @@
-# Description:
-#   Code describing QUIC frame types.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-package_group(
-    name = "internal",
-    packages = [
-        "//gfe/gfe2/...",
-        "//gfe/quic/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_test(
     name = "quic_frames_test",
@@ -18,6 +20,5 @@ envoy_cc_test(
         "//source/common/quic/core/frames:quic_frames_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
     ],
 )

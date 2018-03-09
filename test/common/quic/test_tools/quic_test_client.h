@@ -27,7 +27,7 @@
 #include "common/quic/platform/api/quic_map_util.h"
 #include "common/quic/platform/api/quic_string_piece.h"
 #include "common/quic/tools/quic_client.h"
-#include "testing/base/public/gmock.h"
+#include "gmock/gmock.h"
 
 namespace gfe_quic {
 

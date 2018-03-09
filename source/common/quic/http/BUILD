@@ -1,21 +1,17 @@
-# *EXPERIMENTAL* HTTP/2 encoder/decoder. Do NOT depend upon in production code.
+licenses(["notice"])  # Apache 2
 
-# Please put rules in lexical order by name within sections.
 
-package_group(
-    name = "gfe_quic",
-    packages = [
-        # Temporarily allow gfe2 and spdy access to all targets.
-        # TODO: Figure out which targets to expose.
-        "//gfe/gfe2/...",
-        "//source/common/quic/http/...",
-        "//source/common/quic/spdy_utils/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
 
-package(default_visibility = ["//source/common/quic/http:gfe_quic"])
-################################################################################
-# Libraries (i.e. production code).
+envoy_package()
+
 
 envoy_cc_library(
     name = "quic_http_constants_lib",

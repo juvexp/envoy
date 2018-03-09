@@ -18,7 +18,7 @@
 #include "file/base/helpers.h"
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
 #include "common/quic/spdy_utils/platform/api/spdy_string_utils.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/mt_random.h"
 
 namespace gfe_spdy {

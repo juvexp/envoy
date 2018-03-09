@@ -25,7 +25,7 @@
 #include "common/quic/http/decoder/quic_http_decode_buffer.h"
 #include "common/quic/http/decoder/quic_http_decode_status.h"
 #include "common/quic/platform/api/quic_bug_tracker.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/mt_random.h"
 #include "util/random/test_random-inl.h"
 

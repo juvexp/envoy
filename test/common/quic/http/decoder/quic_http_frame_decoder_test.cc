@@ -26,7 +26,7 @@
 #include "common/quic/platform/api/quic_reconstruct_object.h"
 #include "common/quic/platform/api/quic_string.h"
 #include "common/quic/platform/api/quic_string_piece.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 using ::testing::AssertionResult;
 using ::testing::AssertionSuccess;

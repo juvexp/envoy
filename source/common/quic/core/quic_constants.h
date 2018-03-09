@@ -215,6 +215,10 @@ const QuicByteCount kMaxStreamLength = (UINT64_C(1) << 62) - 1;
 
 // The max value that can be encoded using IETF Var Ints.
 const uint64_t kMaxIetfVarInt = UINT64_C(0x3fffffffffffffff);
+
+// The maximum stream id value that is supported - (2^32)-1
+const QuicStreamId kMaxStreamId = 0xffffffff;
+
 }  // namespace gfe_quic
 
 #endif  // GFE_QUIC_CORE_QUIC_CONSTANTS_H_

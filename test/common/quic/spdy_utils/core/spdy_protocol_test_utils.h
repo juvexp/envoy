@@ -32,8 +32,8 @@
 #include "base/logging.h"
 #include "common/quic/spdy_utils/core/spdy_protocol.h"
 #include "test/common/quic/spdy_utils/core/spdy_test_utils.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace gfe_spdy {
 namespace test {

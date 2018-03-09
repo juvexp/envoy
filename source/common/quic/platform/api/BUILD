@@ -1,24 +1,17 @@
-# Description:
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-package_group(
-    name = "internal",
-
-    # If you are adding a package to this list, please make sure to also update
-    # _quic_test_patterns in
-    # //depot/google3/gfe/tools/continuous_builds/gfe.blueprint otherwise you
-    # risk build breakage.
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//source/common/quic/...",
-        "//gfe/tools/...",
-        "//net/grpc/internal/src/core/quic/...",
-        "//third_party/pcc_quic/...",
-        "//video/streaming/quic/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_library(
     name = "quic_aligned_lib",

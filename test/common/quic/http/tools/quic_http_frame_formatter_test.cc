@@ -15,8 +15,8 @@
 #include "test/common/quic/http/tools/quic_http_frame_formatter.h"
 
 #include "base/logging.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

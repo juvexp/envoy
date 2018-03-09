@@ -298,7 +298,9 @@ QuicConnection::QuicConnection(
       probing_retransmission_pending_(false),
       last_control_frame_id_(kInvalidControlFrameId),
       negotiate_version_early_(
-          GetQuicReloadableFlag(quic_server_early_version_negotiation)) {
+          GetQuicReloadableFlag(quic_server_early_version_negotiation)),
+      always_discard_packets_after_close_(
+          GetQuicReloadableFlag(quic_always_discard_packets_after_close)) {
   QUIC_DLOG(INFO) << ENDPOINT
                   << "Created connection with connection_id: " << connection_id
                   << " and version: "
@@ -1812,6 +1814,12 @@ bool QuicConnection::CanWrite(HasRetransmittableData retransmittable) {
 }
 
 bool QuicConnection::WritePacket(SerializedPacket* packet) {
+  if (always_discard_packets_after_close_ && ShouldDiscardPacket(*packet)) {
+    QUIC_FLAG_COUNT_N(
+        gfe2_reloadable_flag_quic_always_discard_packets_after_close, 1, 2);
+    ++stats_.packets_discarded;
+    return true;
+  }
   if (packet->packet_number < sent_packet_manager_.GetLargestSentPacket()) {
     QUIC_BUG << "Attempt to write packet:" << packet->packet_number
              << " after:" << sent_packet_manager_.GetLargestSentPacket();
@@ -1819,7 +1827,7 @@ bool QuicConnection::WritePacket(SerializedPacket* packet) {
                     ConnectionCloseBehavior::SEND_CONNECTION_CLOSE_PACKET);
     return true;
   }
-  if (ShouldDiscardPacket(*packet)) {
+  if (!always_discard_packets_after_close_ && ShouldDiscardPacket(*packet)) {
     ++stats_.packets_discarded;
     return true;
   }
@@ -2640,6 +2648,13 @@ void QuicConnection::SendConnectivityProbingPacket(
     QuicPacketWriter* probing_writer,
     const QuicSocketAddress& peer_address) {
   DCHECK(peer_address.IsInitialized());
+  if (always_discard_packets_after_close_ && !connected_) {
+    QUIC_FLAG_COUNT_N(
+        gfe2_reloadable_flag_quic_always_discard_packets_after_close, 2, 2);
+    QUIC_BUG << "Not sending connectivity probing packet as connection is "
+             << "disconnected.";
+    return;
+  }
   if (perspective_ == Perspective::IS_SERVER && probing_writer == nullptr) {
     // Server can use default packet writer to write probing packet.
     probing_writer = writer_;

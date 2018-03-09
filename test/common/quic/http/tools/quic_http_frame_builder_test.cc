@@ -17,7 +17,7 @@
 // Tests of QuicHttpFrameBuilder.
 
 #include "testing/base/public/gunit-spi.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 namespace test {

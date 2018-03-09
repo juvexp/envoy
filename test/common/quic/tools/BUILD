@@ -1,26 +1,17 @@
-# Description:
-#   Code for QUIC (see go/quic) which not used in production.
+licenses(["notice"])  # Apache 2
 
-package(default_visibility = [":internal"])
 
-load("//gfe/gfe2/tools:build_defs.bzl", "cc_test_library")
-
-package_group(
-    name = "internal",
-
-    # If you are adding a package to this list, please make sure to also update
-    # _quic_test_patterns in
-    # //depot/google3/gfe/tools/continuous_builds/gfe.blueprint otherwise you
-    # risk build breakage.
-    packages = [
-        "//gfe/cluster_broker/...",
-        "//gfe/gfe2/...",
-        "//gfe/quic/...",
-        "//gfe/test_tools/...",
-        "//gfe/tools/...",
-        "//net/hostdatapath/testing/espresso/...",
-    ],
+load(
+   "//bazel:envoy_build_system.bzl",
+   "envoy_cc_binary",
+   "envoy_cc_library",
+   "envoy_cc_test",
+   "envoy_cc_test_library",
+   "envoy_package",
 )
+
+envoy_package()
+
 
 envoy_cc_test(
     name = "quic_client_test",
@@ -39,7 +30,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//test/common/quic/test_tools:quic_test_utils",
         "//net/util",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -50,7 +40,6 @@ envoy_cc_test(
         "//source/common/quic/tools:quic_simple_server_session_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:mock_random",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -80,8 +69,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_stream_peer",
         "//test/common/quic/test_tools:quic_sustained_bandwidth_recorder_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/strings",
     ],
 )
 
@@ -101,8 +88,6 @@ envoy_cc_test(
         "//test/common/quic/test_tools:quic_spdy_session_peer",
         "//test/common/quic/test_tools:quic_stream_peer",
         "//test/common/quic/test_tools:quic_test_utils",
-        "//testing/base/public:gunit_main",
-        "//third_party/absl/strings",
     ],
 )
 
@@ -117,7 +102,6 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_str_cat_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
-        "//testing/base/public:gunit_main",
     ],
 )
 
@@ -144,6 +128,5 @@ envoy_cc_test(
         "//test/common/quic/test_tools:mock_quic_dispatcher",
         "//test/common/quic/test_tools:quic_test_utils",
         "//net/util",
-        "//testing/base/public:gunit_main",
     ],
 )

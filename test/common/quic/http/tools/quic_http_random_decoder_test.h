@@ -38,7 +38,7 @@
 #include "common/quic/platform/api/quic_string_piece.h"
 #include "test/common/quic/platform/api/quic_test.h"
 #include "common/quic/platform/api/quic_test_random.h"  // IWYU pragma: export
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 #include "util/random/mt_random.h"
 
 namespace gfe_quic {

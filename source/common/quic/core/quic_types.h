@@ -44,8 +44,11 @@ typedef uint64_t QuicIetfStreamId;
 typedef uint64_t QuicIetfStreamOffset;
 
 const size_t kQuicPathFrameBufferSize = 8;
-
 typedef std::array<uint8_t, kQuicPathFrameBufferSize> QuicPathFrameBuffer;
+
+// Application error code used in the QUIC Stop Sending frame.
+typedef uint16_t QuicApplicationErrorCode;
+
 // A struct for functions which consume data payloads and fins.
 struct QUIC_EXPORT_PRIVATE QuicConsumedData {
   QuicConsumedData(size_t bytes_consumed, bool fin_consumed);

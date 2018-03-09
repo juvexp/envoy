@@ -18,7 +18,7 @@
 #include "common/quic/http/decoder/quic_http_frame_decoder_listener.h"
 #include "common/quic/http/quic_http_constants.h"
 #include "common/quic/http/quic_http_structures.h"
-#include "testing/base/public/gunit.h"
+#include "gtest/gtest.h"
 
 namespace gfe_quic {
 

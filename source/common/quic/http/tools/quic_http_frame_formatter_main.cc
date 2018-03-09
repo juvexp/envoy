@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
   } else {
     std::cerr << "Reading from stdin\n";
     string file_contents = StringFromStdin();
-    if (file_contents.size() > 0) {
+    if (!file_contents.empty()) {
       util::StatusOr<string> status_or_formatted =
           gfe_quic::test::FormatFramesInFileContents(file_contents);
       if (!status_or_formatted.ok()) {
@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
         return 1;
       }
       string formatted_contents = status_or_formatted.ConsumeValueOrDie();
-      if (formatted_contents == "") {
+      if (formatted_contents.empty()) {
         std::cout << file_contents;
         return 1;
       } else {
