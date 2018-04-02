@@ -60,7 +60,7 @@ class ChloExtractorTest : public QuicTest {
     header_.version_flag = true;
     header_.version = AllSupportedVersions().front();
     header_.reset_flag = false;
-    header_.packet_number_length = PACKET_6BYTE_PACKET_NUMBER;
+    header_.packet_number_length = PACKET_4BYTE_PACKET_NUMBER;
     header_.packet_number = 1;
   }
 
@@ -93,10 +93,8 @@ TEST_F(ChloExtractorTest, FindsValidChlo) {
   CryptoHandshakeMessage client_hello;
   client_hello.set_tag(kCHLO);
 
-  std::string client_hello_str(
-      client_hello.GetSerialized(Perspective::IS_CLIENT)
-          .AsStringPiece()
-          .as_string());
+  std::string client_hello_str((string(
+      client_hello.GetSerialized(Perspective::IS_CLIENT).AsStringPiece())));
   // Construct a CHLO with each supported version
   for (ParsedQuicVersion version : AllSupportedVersions()) {
     ParsedQuicVersionVector versions(SupportedVersions(version));
@@ -117,10 +115,8 @@ TEST_F(ChloExtractorTest, DoesNotFindValidChloOnWrongStream) {
   CryptoHandshakeMessage client_hello;
   client_hello.set_tag(kCHLO);
 
-  std::string client_hello_str(
-      client_hello.GetSerialized(Perspective::IS_CLIENT)
-          .AsStringPiece()
-          .as_string());
+  std::string client_hello_str((string(
+      client_hello.GetSerialized(Perspective::IS_CLIENT).AsStringPiece())));
   MakePacket(
       new QuicStreamFrame(kCryptoStreamId + 1, false, 0, client_hello_str));
   EXPECT_FALSE(
@@ -131,10 +127,8 @@ TEST_F(ChloExtractorTest, DoesNotFindValidChloOnWrongOffset) {
   CryptoHandshakeMessage client_hello;
   client_hello.set_tag(kCHLO);
 
-  std::string client_hello_str(
-      client_hello.GetSerialized(Perspective::IS_CLIENT)
-          .AsStringPiece()
-          .as_string());
+  std::string client_hello_str((string(
+      client_hello.GetSerialized(Perspective::IS_CLIENT).AsStringPiece())));
   MakePacket(new QuicStreamFrame(kCryptoStreamId, false, 1, client_hello_str));
   EXPECT_FALSE(
       ChloExtractor::Extract(*packet_, AllSupportedVersions(), {}, &delegate_));

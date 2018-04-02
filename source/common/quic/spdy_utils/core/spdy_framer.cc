@@ -23,6 +23,7 @@
 #include <list>
 #include <new>
 
+#include "base/casts.h"
 #include "base/commandlineflags.h"
 #include "base/logging.h"
 #include "base/macros.h"

@@ -36,7 +36,6 @@
 #include "common/quic/core/quic_spdy_client_stream.h"
 #include "common/quic/core/quic_stream.h"
 #include "common/quic/core/quic_utils.h"
-#include "common/quic/platform/api/quic_flag_utils.h"
 #include "common/quic/platform/api/quic_flags.h"
 #include "common/quic/platform/api/quic_logging.h"
 #include "common/quic/platform/api/quic_ptr_util.h"
@@ -74,8 +73,6 @@
 #include "net/util/netutil.h"
 #include "testing/base/public/test_utils.h"
 #include "util/time/clock.h"
-
-extern base::Flag<bool> FLAGS_gfe_always_track_codepoints_for_tests;
 
 namespace gfe_quic {
 namespace test {
@@ -382,13 +379,6 @@ class EndToEndTest : public QuicTestWithParam<TestParams> {
     return &session->connection()->sent_packet_manager();
   }
 
-  bool GetServerGoAwaySent() const {
-    QuicDispatcher* dispatcher =
-        QuicServerPeer::GetDispatcher(server_thread_->server());
-    QuicSession* session = dispatcher->session_map().begin()->second.get();
-    return session->goaway_sent();
-  }
-
   bool Initialize() {
     QuicTagVector copt;
     server_config_.SetConnectionOptionsToSend(copt);
@@ -576,23 +566,6 @@ class EndToEndTest : public QuicTestWithParam<TestParams> {
         *client_->client()->client_session(), n);
   }
 
-  void WaitForDelayedAcks() {
-    // kWaitDuration is a period of time that is long enough for all delayed
-    // acks to be sent and received on the other end.
-    const QuicTime::Delta kWaitDuration =
-        4 * QuicTime::Delta::FromMilliseconds(kDefaultDelayedAckTimeMs);
-
-    const QuicClock* clock =
-        client_->client()->client_session()->connection()->clock();
-
-    QuicTime wait_until = clock->ApproximateNow() + kWaitDuration;
-    while (clock->ApproximateNow() < wait_until) {
-      QUIC_LOG_EVERY_N_SEC(INFO, 0.01) << "Waiting for delayed acks...";
-      // This waits for up to 50 ms.
-      client_->client()->WaitForEvents();
-    }
-  }
-
   bool initialized_;
   QuicSocketAddress server_address_;
   QuicString server_hostname_;
@@ -702,68 +675,6 @@ TEST_P(EndToEndTestWithTls, MultipleRequestResponse) {
   EXPECT_EQ("200", client_->response_headers()->find(":status")->second);
   EXPECT_EQ(kBarResponseBody, client_->SendSynchronousRequest("/bar"));
   EXPECT_EQ("200", client_->response_headers()->find(":status")->second);
-}
-
-//
-// This test checks that the server detects the case where a new
-// inbound stream is detected _after_ the server has sent a GoAway.
-// We wish to detect/log/count this to see how often it occurs.
-// If it occurs "a lot" then we will need to fix the underlying issues.
-//
-TEST_P(EndToEndTestWithTls, MultipleRequestResponseGoAway) {
-  // ensure that all late-session events are counted
-  bool flag_save = base::GetFlag(FLAGS_gfe_always_track_codepoints_for_tests);
-  base::SetFlag(&FLAGS_gfe_always_track_codepoints_for_tests, true);
-  ASSERT_TRUE(Initialize());
-
-  QUIC_LOG(INFO) << "Starting MultipleRequestResponseGoAway";
-  // establish some data xfer, etc.
-  EXPECT_EQ(kFooResponseBody, client_->SendSynchronousRequest("/foo"));
-  EXPECT_EQ("200", client_->response_headers()->find(":status")->second);
-
-  QUIC_LOG(INFO) << "Did first transfer";
-  // send a GoAway
-  server_thread_->SendGoAway(true);
-  QUIC_LOG(INFO) << "Requested GoAway, goaway_received gave us "
-                 << client_->client()->goaway_received();
-  QUIC_LOG(INFO) << "GetServerGoAwaySent() returned " << GetServerGoAwaySent();
-  EXPECT_TRUE(GetServerGoAwaySent());
-
-  // Currently, the client does not receive/process
-  // the go-away until after it starts creating the
-  // second session. This is an artifact of how the
-  // socket and events are managed w.r.t. the main
-  // line of processing. IF that changes, then the
-  // go-away could be received/processed BEFORE
-  // the second session is started ... in which case
-  // the client, noting that a go-away has been
-  // received, will DTRT and not start session 2.
-  // This EXPECT has been placed here so that if
-  // the goaway is processed prior to starting the
-  // second session, the test will explicitly fail
-  // here and the developer can read the comments
-  // and understand what is going on.
-  EXPECT_FALSE(client_->client()->goaway_received());
-
-  // get the late-stream count prior to the explicit attempt
-  // to create a new (late) stream.
-  int late_stream_count = QUIC_GET_CODE_COUNT_IMPL(late_new_stream_1_of_1);
-
-  // try the second session.
-  client_->SendSynchronousRequest("/bar");
-
-  // The server should have counted a late new stream.
-  EXPECT_EQ(late_stream_count + 1, QUIC_GET_CODE_COUNT(late_new_stream_1_of_1));
-
-  QUIC_LOG(INFO) << " After send-synch, goaway_received gave us "
-                 << client_->client()->goaway_received()
-                 << " and late-stream-count changed from " << late_stream_count
-                 << " to " << QUIC_GET_CODE_COUNT(late_new_stream_1_of_1);
-  // by now, we should have received the G/A into the client. Ensure it...
-  EXPECT_TRUE(client_->client()->goaway_received());
-  QUIC_LOG(INFO) << "Did second transfer";
-  // restore
-  base::SetFlag(&FLAGS_gfe_always_track_codepoints_for_tests, flag_save);
 }
 
 TEST_P(EndToEndTestWithTls, MultipleStreams) {
@@ -2134,7 +2045,7 @@ TEST_P(EndToEndTestWithTls,
   QuicConnectionId incorrect_connection_id =
       client_->client()->client_session()->connection()->connection_id() + 1;
   std::unique_ptr<QuicEncryptedPacket> packet(
-      QuicFramer::BuildVersionNegotiationPacket(incorrect_connection_id,
+      QuicFramer::BuildVersionNegotiationPacket(incorrect_connection_id, false,
                                                 server_supported_versions_));
   testing::NiceMock<MockQuicConnectionDebugVisitor> visitor;
   client_->client()->client_session()->connection()->set_debug_visitor(
@@ -2252,7 +2163,7 @@ TEST_P(EndToEndTestWithTls, BadEncryptedData) {
   std::unique_ptr<QuicEncryptedPacket> packet(ConstructEncryptedPacket(
       client_->client()->client_session()->connection()->connection_id(), false,
       false, 1, "At least 20 characters.", PACKET_8BYTE_CONNECTION_ID,
-      PACKET_6BYTE_PACKET_NUMBER));
+      PACKET_4BYTE_PACKET_NUMBER));
   // Damage the encrypted data.
   QuicString damaged_packet(packet->data(), packet->length());
   damaged_packet[30] ^= 0x01;
@@ -3104,7 +3015,7 @@ TEST_P(EndToEndTest, LastPacketSentIsConnectivityProbing) {
   EXPECT_EQ("200", client_->response_headers()->find(":status")->second);
 
   // Wait for the client's ACK (of the response) to be received by the server.
-  WaitForDelayedAcks();
+  client_->WaitForDelayedAcks();
 
   // We are sending a connectivity probing packet from an unchanged client
   // address, so the server will not respond to us with a connectivity probing
@@ -3112,7 +3023,7 @@ TEST_P(EndToEndTest, LastPacketSentIsConnectivityProbing) {
   client_->SendConnectivityProbing();
 
   // Wait for the server's last ACK to be received by the client.
-  WaitForDelayedAcks();
+  client_->WaitForDelayedAcks();
 }
 
 class EndToEndBufferedPacketsTest : public EndToEndTest {

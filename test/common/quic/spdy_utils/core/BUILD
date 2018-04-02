@@ -213,7 +213,6 @@ envoy_cc_test(
         "//source/common/quic/spdy_utils/core:spdy_protocol_lib",
         ":spdy_test_utils_lib",
         "//base",
-        "//source/common/quic/spdy_utils/platform/api:spdy_flags_lib",
     ],
 )
 

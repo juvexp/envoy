@@ -59,7 +59,6 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core:quic_arena_scoped_ptr_lib",
         "//source/common/quic/core:quic_one_block_arena_lib",
-        "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//test/common/quic/platform/api:quic_test_lib",
     ],
 )
@@ -336,6 +335,7 @@ envoy_cc_test(
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
+        "//source/common/quic/platform/api:quic_uint128_lib",
         "//test/common/quic/test_tools:quic_config_peer",
         "//test/common/quic/test_tools:quic_test_utils",
     ],
@@ -477,7 +477,6 @@ envoy_cc_test(
         "//source/common/quic/core:quic_utils_lib",
         "//base",
         "//source/common/quic/core/crypto:quic_encryption_lib",
-        "//source/common/quic/platform/api:quic_flag_utils_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//source/common/quic/platform/api:quic_map_util_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
@@ -761,6 +760,7 @@ envoy_cc_test(
     deps = [
         "//source/common/quic/core:quic_client_lib",
         "//source/common/quic/core:spdy_utils_lib",
+        "//base",
         "//source/common/quic/core:quic_session_lib",
         "//source/common/quic/core/crypto:quic_encryption_lib",
         "//source/common/quic/platform/api:quic_arraysize_lib",
@@ -981,7 +981,6 @@ envoy_cc_test_library(
         "//gfe/gfe2/jetstream:http_constants_lib",
         "//gfe/gfe2/test_tools:valgrind_utils_lib",
         "//source/common/quic/core/crypto:quic_encryption_lib",
-        "//source/common/quic/platform/api:quic_flag_utils_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",

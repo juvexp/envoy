@@ -23,8 +23,7 @@
 #include "common/quic/platform/api/quic_flags.h"
 #include "common/quic/platform/api/quic_prefetch.h"
 #include "common/quic/platform/api/quic_string.h"
-
-using absl::MakeUint128;
+#include "common/quic/platform/api/quic_uint128.h"
 
 namespace gfe_quic {
 namespace {
@@ -39,9 +38,9 @@ namespace {
 #endif
 
 #ifdef QUIC_UTIL_HAS_UINT128
-absl::uint128 IncrementalHashFast(absl::uint128 uhash, QuicStringPiece data) {
+QuicUint128 IncrementalHashFast(QuicUint128 uhash, QuicStringPiece data) {
   // This code ends up faster than the naive implementation for 2 reasons:
-  // 1. uint128 from base/int128.h is sufficiently complicated that the compiler
+  // 1. QuicUint128 is sufficiently complicated that the compiler
   //    cannot transform the multiplication by kPrime into a shift-multiply-add;
   //    it has go through all of the instructions for a 128-bit multiply.
   // 2. Because there are so fewer instructions (around 13), the hot loop fits
@@ -49,14 +48,14 @@ absl::uint128 IncrementalHashFast(absl::uint128 uhash, QuicStringPiece data) {
   // kPrime = 309485009821345068724781371
   static const __uint128_t kPrime =
       (static_cast<__uint128_t>(16777216) << 64) + 315;
-  __uint128_t xhash =
-      (static_cast<__uint128_t>(absl::Uint128High64(uhash)) << 64) +
-      absl::Uint128Low64(uhash);
+  auto hi = QuicUint128High64(uhash);
+  auto lo = QuicUint128Low64(uhash);
+  __uint128_t xhash = (static_cast<__uint128_t>(hi) << 64) + lo;
   const uint8_t* octets = reinterpret_cast<const uint8_t*>(data.data());
   for (size_t i = 0; i < data.length(); ++i) {
     xhash = (xhash ^ octets[i]) * kPrime;
   }
-  return MakeUint128(
+  return MakeQuicUint128(
       static_cast<uint64_t>(xhash >> 64),
       static_cast<uint64_t>(xhash & UINT64_C(0xFFFFFFFFFFFFFFFF)));
 }
@@ -64,19 +63,19 @@ absl::uint128 IncrementalHashFast(absl::uint128 uhash, QuicStringPiece data) {
 
 #ifndef QUIC_UTIL_HAS_UINT128
 // Slow implementation of IncrementalHash. In practice, only used by Chromium.
-uint128 IncrementalHashSlow(uint128 hash, QuicStringPiece data) {
+QuicUint128 IncrementalHashSlow(QuicUint128 hash, QuicStringPiece data) {
   // kPrime = 309485009821345068724781371
-  static const uint128 kPrime = MakeUint128(16777216, 315);
+  static const uint128 kPrime = MakeQuicUint128(16777216, 315);
   const uint8_t* octets = reinterpret_cast<const uint8_t*>(data.data());
   for (size_t i = 0; i < data.length(); ++i) {
-    hash = hash ^ MakeUint128(0, octets[i]);
+    hash = hash ^ MakeQuicUint128(0, octets[i]);
     hash = hash * kPrime;
   }
   return hash;
 }
 #endif
 
-absl::uint128 IncrementalHash(absl::uint128 hash, QuicStringPiece data) {
+QuicUint128 IncrementalHash(QuicUint128 hash, QuicStringPiece data) {
 #ifdef QUIC_UTIL_HAS_UINT128
   return IncrementalHashFast(hash, data);
 #else
@@ -104,27 +103,27 @@ uint64_t QuicUtils::FNV1a_64_Hash(QuicStringPiece data) {
 }
 
 // static
-absl::uint128 QuicUtils::FNV1a_128_Hash(QuicStringPiece data) {
+QuicUint128 QuicUtils::FNV1a_128_Hash(QuicStringPiece data) {
   return FNV1a_128_Hash_Three(data, QuicStringPiece(), QuicStringPiece());
 }
 
 // static
-absl::uint128 QuicUtils::FNV1a_128_Hash_Two(QuicStringPiece data1,
-                                            QuicStringPiece data2) {
+QuicUint128 QuicUtils::FNV1a_128_Hash_Two(QuicStringPiece data1,
+                                          QuicStringPiece data2) {
   return FNV1a_128_Hash_Three(data1, data2, QuicStringPiece());
 }
 
 // static
-absl::uint128 QuicUtils::FNV1a_128_Hash_Three(QuicStringPiece data1,
-                                              QuicStringPiece data2,
-                                              QuicStringPiece data3) {
+QuicUint128 QuicUtils::FNV1a_128_Hash_Three(QuicStringPiece data1,
+                                            QuicStringPiece data2,
+                                            QuicStringPiece data3) {
   // The two constants are defined as part of the hash algorithm.
   // see http://www.isthe.com/chongo/tech/comp/fnv/
   // kOffset = 144066263297769815596495629667062367629
-  const absl::uint128 kOffset =
-      MakeUint128(UINT64_C(7809847782465536322), UINT64_C(7113472399480571277));
+  const QuicUint128 kOffset = MakeQuicUint128(UINT64_C(7809847782465536322),
+                                              UINT64_C(7113472399480571277));
 
-  absl::uint128 hash = IncrementalHash(kOffset, data1);
+  QuicUint128 hash = IncrementalHash(kOffset, data1);
   if (data2.empty()) {
     return hash;
   }
@@ -137,9 +136,9 @@ absl::uint128 QuicUtils::FNV1a_128_Hash_Three(QuicStringPiece data1,
 }
 
 // static
-void QuicUtils::SerializeUint128Short(absl::uint128 v, uint8_t* out) {
-  const uint64_t lo = absl::Uint128Low64(v);
-  const uint64_t hi = absl::Uint128High64(v);
+void QuicUtils::SerializeUint128Short(QuicUint128 v, uint8_t* out) {
+  const uint64_t lo = QuicUint128Low64(v);
+  const uint64_t hi = QuicUint128High64(v);
   // This assumes that the system is little-endian.
   memcpy(out, &lo, sizeof(lo));
   memcpy(out + sizeof(lo), &hi, sizeof(hi) / 2);

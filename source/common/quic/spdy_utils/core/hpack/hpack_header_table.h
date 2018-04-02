@@ -76,7 +76,8 @@ class SPDY_EXPORT_PRIVATE HpackHeaderTable {
   struct SPDY_EXPORT_PRIVATE EntriesEq {
     bool operator()(const HpackEntry* lhs, const HpackEntry* rhs) const;
   };
-  typedef hash_set<HpackEntry*, EntryHasher, EntriesEq> UnorderedEntrySet;
+  typedef __gnu_cxx::hash_set<HpackEntry*, EntryHasher, EntriesEq>
+      UnorderedEntrySet;
 
   typedef __gnu_cxx::hash_map<SpdyStringPiece, const HpackEntry*>
       NameToEntryMap;

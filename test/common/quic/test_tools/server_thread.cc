@@ -97,25 +97,6 @@ void ServerThread::Quit() {
   }
 }
 
-// Call to request that the server send a GoAway.
-void ServerThread::SendGoAway(bool wait_for_transmit) {
-  // Perform the actual send-go-away operation from the server thread, to
-  // avoid synchronization issues.
-  QUIC_LOG(INFO) << "Scheduling A Go-Away";
-  Schedule([this]() {
-    QUIC_LOG(INFO) << "Server: Sending GoAway";
-    QuicDispatcher* dispatcher = QuicServerPeer::GetDispatcher(server());
-    QuicSession* session = dispatcher->session_map().begin()->second.get();
-    session->SendGoAway(QUIC_PEER_GOING_AWAY, "Going Away.");
-    goaway_sent_.Notify();  // client will wait for this.
-  });
-  if (wait_for_transmit == true) {
-    // client now waiting for the g/a to be sent!
-    QUIC_LOG(INFO) << "Waiting for server to send Go-Away";
-    goaway_sent_.WaitForNotification();
-  }
-}
-
 void ServerThread::MaybeNotifyOfHandshakeConfirmation() {
   if (confirmed_.HasBeenNotified()) {
     // Only notify once.

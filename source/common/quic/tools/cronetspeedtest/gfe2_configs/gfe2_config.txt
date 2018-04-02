@@ -1,0 +1,133 @@
+# Copyright 2018 Google Inc. All Rights Reserved.
+
+gfe2_proto <
+  request_gzip_from_backends: true
+  num_silos: 15
+  lame_duck_timeout_ms: 0
+  initial_timeout_ms: 0
+  gfe_type: "scotty"
+  generate_204: true
+  default_host: "www.google.com"
+  gfe_is_frontline: true
+  proxylogs_sampling_rate: 1.0
+  enable_gaiauser_logging: true
+  gaialogs_sampling_rate: 1.0
+  backend_subset_id: 0
+  dynamic_resource_management <
+    max_memory_limit_kb: 25165815
+    idle_session_memory_threshold: 0.8
+  >
+  faster_stats_proto <
+    faster_server_port: 6441
+  >
+>
+acceptor_proto <
+  max_client_connections: 25000
+  lame_duck_suspend_listeners_delay_in_ms: 0
+  listen_list <
+    addresses: "::"
+    accept_type: 1
+    port: 8888
+    sessiontype: "http"
+  >
+  listen_list <
+    port: PORT_PLACEHOLDER
+    addresses: "::"
+    accept_type: 1
+    sessiontype: "https"
+  >
+  listen_list <
+    port: PORT_PLACEHOLDER
+    addresses: "::"
+    accept_type: 1
+    protocol: 1
+    sessiontype: "secure_quic"
+  >
+>
+ssl_stage_proto <
+  certificates <
+    base_directory: "CERTS_DIR_PLACEHOLDER"
+    issuing_certificates_file: "rootCA.pem"
+    cert <
+      name: "HOSTNAME_PLACEHOLDER"
+    >
+  >
+>
+spdy_config <
+  enable_spdy: true
+  max_streams_per_connection: 100
+>
+quic_config <
+>
+headers_stage_proto <
+  max_time_before_purge_required_ms: 240000
+  min_time_before_purge_allowed_ms: 5000
+>
+clientauth_files <
+  badips_filename: "/home/build/google3/googledata/gws/badurls_badips"
+  debugips_filename: "/home/build/google3/googledata/gws//goodips_debug"
+  bad_debugips_filename: "/home/build/google3/googledata/gws/badips_debug"
+>
+backend_stage <
+  backend_policy <
+    full_config <
+      group_config <
+        backend_group_name: "upload_server"
+        modify_cluster_config <
+          cluster_name: "corp"
+          backend_set <
+            backend_info <
+              backend_name_postfix: "localhost:19999"
+            >
+          >
+        >
+      >
+    >
+  >
+  backend_group_params <
+    group_name: "upload_server"
+    initial_health_check_query: "/healthz"
+    max_connections_per_backend: 100
+    gslb_params <
+      is_bm_enabled: false
+      is_lb_enabled: false
+      is_bm_health_checked: false
+      healthz_string: "/healthz"
+    >
+  >
+  backend_group_gslb_policy <
+    service_name: "upload_server"
+    status: 0
+    Primaries {
+      dc: "corp"
+      weight: 1.0
+    }
+  >
+>
+service_policy <
+  services <
+    service_list <
+      service_name: "upload_server"
+      reject_nonstandard_methods: false
+      disable_proxylog: false
+      total_backend_response_timeout_ms: 36000000
+      is_remotecache_enabled: false
+      idle_timeout_in_ms: 240000
+    >
+    new_url_map <
+      host_transform <
+        match_regexp: "^.*$"
+        replacement: "ignored"
+      >
+      service_map: "HOSTSET all_hosts = {'ignored'}; SCOPE any [ SERVICE upload_server [ %all_hosts : {'/uploads', '/uploads/*'}; ] ]"
+      service_map_default: ""
+    >
+  >
+  google_proxy_file: "/home/build/nonconf/google3/googledata/gfe/goodips_googleproxy"
+  trusted_proxy_file: "/home/build/nonconf/google3/googledata/gws/goodips_proxy"
+>
+googledata_proto <
+  version_file: ""
+  google_proxy_file: "/home/build/nonconf/google3/googledata/gfe/goodips_googleproxy"
+  trusted_proxy_file: "/home/build/nonconf/google3/googledata/gws/goodips_proxy"
+>

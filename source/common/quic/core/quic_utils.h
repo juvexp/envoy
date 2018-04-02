@@ -18,7 +18,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "base/int128.h"
 #include "base/macros.h"
 #include "common/quic/core/quic_error_codes.h"
 #include "common/quic/core/quic_types.h"
@@ -26,6 +25,7 @@
 #include "common/quic/platform/api/quic_socket_address.h"
 #include "common/quic/platform/api/quic_string.h"
 #include "common/quic/platform/api/quic_string_piece.h"
+#include "common/quic/platform/api/quic_uint128.h"
 
 namespace gfe_quic {
 
@@ -37,22 +37,22 @@ class QUIC_EXPORT_PRIVATE QuicUtils {
 
   // Returns the 128 bit FNV1a hash of the data.  See
   // http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-param
-  static absl::uint128 FNV1a_128_Hash(QuicStringPiece data);
+  static QuicUint128 FNV1a_128_Hash(QuicStringPiece data);
 
   // Returns the 128 bit FNV1a hash of the two sequences of data.  See
   // http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-param
-  static absl::uint128 FNV1a_128_Hash_Two(QuicStringPiece data1,
-                                          QuicStringPiece data2);
+  static QuicUint128 FNV1a_128_Hash_Two(QuicStringPiece data1,
+                                        QuicStringPiece data2);
 
   // Returns the 128 bit FNV1a hash of the three sequences of data.  See
   // http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-param
-  static absl::uint128 FNV1a_128_Hash_Three(QuicStringPiece data1,
-                                            QuicStringPiece data2,
-                                            QuicStringPiece data3);
+  static QuicUint128 FNV1a_128_Hash_Three(QuicStringPiece data1,
+                                          QuicStringPiece data2,
+                                          QuicStringPiece data3);
 
   // SerializeUint128 writes the first 96 bits of |v| in little-endian form
   // to |out|.
-  static void SerializeUint128Short(absl::uint128 v, uint8_t* out);
+  static void SerializeUint128Short(QuicUint128 v, uint8_t* out);
 
   // Returns the level of encryption as a char*
   static const char* EncryptionLevelToString(EncryptionLevel level);

@@ -24,6 +24,7 @@
 #include "common/quic/platform/api/quic_export.h"
 #include "common/quic/platform/api/quic_string.h"
 #include "common/quic/platform/api/quic_string_piece.h"
+#include "common/quic/platform/api/quic_uint128.h"
 
 namespace gfe_quic {
 
@@ -116,7 +117,7 @@ class QUIC_EXPORT_PRIVATE CryptoHandshakeMessage {
                               QuicStringPiece* out) const;
   QuicErrorCode GetUint32(QuicTag tag, uint32_t* out) const;
   QuicErrorCode GetUint64(QuicTag tag, uint64_t* out) const;
-  QuicErrorCode GetUint128(QuicTag tag, absl::uint128* out) const;
+  QuicErrorCode GetUint128(QuicTag tag, QuicUint128* out) const;
 
   // size returns 4 (message tag) + 2 (uint16_t, number of entries) +
   // (4 (tag) + 4 (end offset))*tag_value_map_.size() + ∑ value sizes.

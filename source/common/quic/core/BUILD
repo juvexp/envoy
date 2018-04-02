@@ -327,6 +327,7 @@ envoy_cc_library(
         "//source/common/quic/platform/api:quic_socket_address_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
+        "//source/common/quic/platform/api:quic_uint128_lib",
     ],
 )
 
@@ -451,6 +452,7 @@ envoy_cc_library(
         "//source/common/quic/core/frames:quic_frames_lib",
         "//source/common/quic/platform/api:quic_export_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
+        "//source/common/quic/platform/api:quic_map_util_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//source/common/quic/platform/api:quic_socket_address_lib",
         "//source/common/quic/platform/api:quic_str_cat_lib",
@@ -953,6 +955,7 @@ envoy_cc_library(
         "//source/common/quic/platform/api:quic_logging_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
+        "//source/common/quic/platform/api:quic_uint128_lib",
     ],
 )
 

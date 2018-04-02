@@ -138,7 +138,7 @@ class SpdyTestDeframerImpl : public SpdyTestDeframer,
   explicit SpdyTestDeframerImpl(
       std::unique_ptr<SpdyDeframerVisitorInterface> listener)
       : listener_(std::move(listener)) {
-    CHECK_NOTNULL(listener_.get());
+    CHECK(listener_ != nullptr);
   }
   ~SpdyTestDeframerImpl() override = default;
 
@@ -279,7 +279,7 @@ void SpdyTestDeframerImpl::AtDataEnd() {
 void SpdyTestDeframerImpl::AtGoAwayEnd() {
   DVLOG(1) << "AtDataEnd";
   CHECK_EQ(frame_type_, GOAWAY);
-  if (CHECK_NOTNULL(goaway_description_)->empty()) {
+  if (ABSL_DIE_IF_NULL(goaway_description_)->empty()) {
     listener_->OnGoAway(std::move(goaway_ir_));
   } else {
     listener_->OnGoAway(SpdyMakeUnique<SpdyGoAwayIR>(
@@ -299,9 +299,9 @@ void SpdyTestDeframerImpl::AtHeadersEnd() {
   CHECK(end_) << "   frame_type_=" << Http2FrameTypeToString(frame_type_);
   CHECK(got_hpack_end_);
 
-  CHECK_NOTNULL(headers_ir_.get());
-  CHECK_NOTNULL(headers_.get());
-  CHECK_NOTNULL(headers_handler_.get());
+  CHECK(headers_ir_ != nullptr);
+  CHECK(headers_ != nullptr);
+  CHECK(headers_handler_ != nullptr);
 
   CHECK_LE(0, padding_len_);
   CHECK_LE(padding_len_, 256);
@@ -326,9 +326,9 @@ void SpdyTestDeframerImpl::AtPushPromiseEnd() {
       << "   frame_type_=" << Http2FrameTypeToString(frame_type_);
   CHECK(end_) << "   frame_type_=" << Http2FrameTypeToString(frame_type_);
 
-  CHECK_NOTNULL(push_promise_ir_.get());
-  CHECK_NOTNULL(headers_.get());
-  CHECK_NOTNULL(headers_handler_.get());
+  CHECK(push_promise_ir_ != nullptr);
+  CHECK(headers_ != nullptr);
+  CHECK(headers_handler_ != nullptr);
 
   CHECK_EQ(headers_ir_.get(), nullptr);
 
@@ -503,7 +503,7 @@ bool SpdyTestDeframerImpl::OnGoAwayFrameData(const char* goaway_data,
   DVLOG(1) << "OnGoAwayFrameData";
   CHECK_EQ(frame_type_, GOAWAY) << "   frame_type_="
                                 << Http2FrameTypeToString(frame_type_);
-  CHECK_NOTNULL(goaway_description_);
+  CHECK(goaway_description_ != nullptr);
   goaway_description_->append(goaway_data, len);
   return true;
 }
@@ -624,7 +624,7 @@ void SpdyTestDeframerImpl::OnSettingOld(SpdyKnownSettingsId id,
   DVLOG(1) << "OnSettingOld id: " << id << std::hex << "    value: " << value;
   CHECK_EQ(frame_type_, SETTINGS) << "   frame_type_="
                                   << Http2FrameTypeToString(frame_type_);
-  CHECK_NOTNULL(settings_);
+  CHECK(settings_ != nullptr);
   settings_->push_back(std::make_pair(id, value));
   settings_ir_->AddSetting(id, value);
 }
@@ -635,7 +635,7 @@ void SpdyTestDeframerImpl::OnSetting(SpdySettingsId id, uint32_t value) {
   DVLOG(1) << "OnSetting id: " << id << std::hex << "    value: " << value;
   CHECK_EQ(frame_type_, SETTINGS)
       << "   frame_type_=" << Http2FrameTypeToString(frame_type_);
-  CHECK_NOTNULL(settings_);
+  CHECK(settings_ != nullptr);
   SpdyKnownSettingsId known_id;
   if (ParseSettingsId(id, &known_id)) {
     settings_->push_back(std::make_pair(known_id, value));
@@ -773,7 +773,7 @@ bool SpdyTestDeframerImpl::OnUnknownFrame(SpdyStreamId stream_id,
 void SpdyTestDeframerImpl::OnHeaderBlockStart() {
   CHECK(frame_type_ == HEADERS || frame_type_ == PUSH_PROMISE)
       << "   frame_type_=" << Http2FrameTypeToString(frame_type_);
-  CHECK_NOTNULL(headers_);
+  CHECK(headers_ != nullptr);
   CHECK_EQ(headers_->size(), 0);
   got_hpack_end_ = false;
 }
@@ -784,14 +784,14 @@ void SpdyTestDeframerImpl::OnHeader(SpdyStringPiece key,
         frame_type_ == PUSH_PROMISE)
       << "   frame_type_=" << Http2FrameTypeToString(frame_type_);
   CHECK(!got_hpack_end_);
-  CHECK_NOTNULL(headers_)->emplace_back(SpdyString(key), SpdyString(value));
-  CHECK_NOTNULL(headers_handler_)->OnHeader(key, value);
+  ABSL_DIE_IF_NULL(headers_)->emplace_back(SpdyString(key), SpdyString(value));
+  ABSL_DIE_IF_NULL(headers_handler_)->OnHeader(key, value);
 }
 
 void SpdyTestDeframerImpl::OnHeaderBlockEnd(
     size_t /* header_bytes_parsed */,
     size_t /* compressed_header_bytes_parsed */) {
-  CHECK_NOTNULL(headers_);
+  CHECK(headers_ != nullptr);
   CHECK(frame_type_ == HEADERS || frame_type_ == CONTINUATION ||
         frame_type_ == PUSH_PROMISE)
       << "   frame_type_=" << Http2FrameTypeToString(frame_type_);
@@ -935,7 +935,7 @@ AssertionResult CollectedFrame::VerifyHasSettings(
 
 DeframerCallbackCollector::DeframerCallbackCollector(
     std::vector<CollectedFrame>* collected_frames)
-    : collected_frames_(CHECK_NOTNULL(collected_frames)) {}
+    : collected_frames_(ABSL_DIE_IF_NULL(collected_frames)) {}
 
 void DeframerCallbackCollector::OnAltSvc(
     std::unique_ptr<SpdyAltSvcIR> frame_ir) {
