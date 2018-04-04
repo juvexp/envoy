@@ -53,3 +53,21 @@ envoy_cc_library(
     deps = [
     ],
 )
+
+envoy_cc_library(
+    name = "quic_flags_impl_lib",
+    hdrs = [
+        "quic_flags_impl.h",
+    ],
+    deps = [
+    ],
+)
+
+envoy_cc_library(
+    name = "quic_flag_utils_impl_lib",
+    hdrs = [
+        "quic_flag_utils_impl.h",
+    ],
+    deps = [
+    ],
+)
