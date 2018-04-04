@@ -4,6 +4,9 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+// TODO: Implement QuicFlagSaverImpl.
+class QuicFlagSaverImpl {};
+
 using QuicTestImpl = ::testing::Test;
 template <class T>
 using QuicTestWithParamImpl = ::testing::TestWithParam<T>;
