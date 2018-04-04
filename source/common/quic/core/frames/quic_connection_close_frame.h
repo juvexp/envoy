@@ -25,6 +25,7 @@ namespace gfe_quic {
 
 struct QUIC_EXPORT_PRIVATE QuicConnectionCloseFrame {
   QuicConnectionCloseFrame();
+  QuicConnectionCloseFrame(QuicErrorCode error_code, QuicString error_details);
 
   friend QUIC_EXPORT_PRIVATE std::ostream& operator<<(
       std::ostream& os,

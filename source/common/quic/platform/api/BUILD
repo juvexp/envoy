@@ -256,6 +256,19 @@ envoy_cc_library(
 )
 
 envoy_cc_library(
+    name = "quic_uint128_lib",
+    hdrs = [
+        "quic_uint128.h",
+    ],
+    deps = [
+        ":quic_export_lib",
+        ":quic_string_lib",
+        ":quic_string_piece_lib",
+        "//source/common/quic/platform/impl:quic_uint128_impl_lib",
+    ],
+)
+
+envoy_cc_library(
     name = "quic_estimate_memory_usage_lib",
     hdrs = [
         "quic_estimate_memory_usage.h",

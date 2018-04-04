@@ -215,6 +215,8 @@ class QuicClientBase {
     }
   }
 
+  void reset_writer() { writer_.reset(); }
+
   ProofVerifier* proof_verifier() const;
 
   void set_bind_to_address(QuicIpAddress address) {
@@ -237,6 +239,8 @@ class QuicClientBase {
 
   NetworkHelper* network_helper();
   const NetworkHelper* network_helper() const;
+
+  bool initialized() const { return initialized_; }
 
  protected:
   // TODO: Move GetNumSentClientHellosFromSession and

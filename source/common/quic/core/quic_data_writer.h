@@ -18,7 +18,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "base/int128.h"
 #include "base/macros.h"
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/platform/api/quic_endian.h"

@@ -54,6 +54,7 @@ envoy_cc_test_library(
         "//base",
         "//source/common/quic/core:quic_config_lib",
         "//source/common/quic/core:quic_packets_lib",
+        "//source/common/quic/platform/api:quic_uint128_lib",
     ],
 )
 

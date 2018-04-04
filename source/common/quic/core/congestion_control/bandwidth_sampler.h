@@ -19,7 +19,6 @@
 #include "common/quic/core/quic_bandwidth.h"
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/core/quic_time.h"
-#include "common/quic/platform/api/quic_containers.h"
 #include "common/quic/platform/api/quic_export.h"
 
 namespace gfe_quic {
@@ -259,9 +258,6 @@ class QUIC_EXPORT_PRIVATE BandwidthSampler : public BandwidthSamplerInterface {
           total_bytes_acked_at_the_last_acked_packet(0),
           is_app_limited(false) {}
   };
-
-  typedef QuicLinkedHashMap<QuicPacketNumber, ConnectionStateOnSentPacket>
-      ConnectionStateMap;
 
   // The total number of congestion controlled bytes sent during the connection.
   QuicByteCount total_bytes_sent_;

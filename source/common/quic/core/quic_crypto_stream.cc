@@ -35,7 +35,7 @@ namespace gfe_quic {
                                                         " ")
 
 QuicCryptoStream::QuicCryptoStream(QuicSession* session)
-    : QuicStream(kCryptoStreamId, session) {
+    : QuicStream(kCryptoStreamId, session, /*is_static=*/true) {
   // The crypto stream is exempt from connection level flow control.
   DisableConnectionFlowControlForThisStream();
 }

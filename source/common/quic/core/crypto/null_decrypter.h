@@ -18,12 +18,12 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "base/int128.h"
 #include "base/macros.h"
 #include "common/quic/core/crypto/quic_decrypter.h"
 #include "common/quic/core/quic_types.h"
 #include "common/quic/platform/api/quic_export.h"
 #include "common/quic/platform/api/quic_string_piece.h"
+#include "common/quic/platform/api/quic_uint128.h"
 
 namespace gfe_quic {
 
@@ -58,10 +58,10 @@ class QUIC_EXPORT_PRIVATE NullDecrypter : public QuicDecrypter {
   uint32_t cipher_id() const override;
 
  private:
-  bool ReadHash(QuicDataReader* reader, absl::uint128* hash);
-  absl::uint128 ComputeHash(QuicTransportVersion version,
-                            QuicStringPiece data1,
-                            QuicStringPiece data2) const;
+  bool ReadHash(QuicDataReader* reader, QuicUint128* hash);
+  QuicUint128 ComputeHash(QuicTransportVersion version,
+                          QuicStringPiece data1,
+                          QuicStringPiece data2) const;
 
   Perspective perspective_;
 

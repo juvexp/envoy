@@ -26,10 +26,6 @@ namespace test {
 // Returns a random integer in the range [lo, hi).
 size_t GenerateUniformInRange(size_t lo, size_t hi, QuicTestRandomBase* rng);
 
-// Generate a string with the allowed character set for HTTP/2 / HPQUIC_HTTP_ACK
-// header names.
-QuicString GenerateQuicHttpHeaderName(size_t len, QuicTestRandomBase* rng);
-
 // Generate a string with the web-safe string character set of specified len.
 QuicString GenerateWebSafeString(size_t len, QuicTestRandomBase* rng);
 

@@ -82,6 +82,7 @@ envoy_cc_binary(
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//source/common/quic/platform/api:quic_text_utils_lib",
         "//source/common/quic/platform/api:quic_url_lib",
+        "//net/base:ipaddress",
         "//net/dns:hostlookup",
     ],
 )

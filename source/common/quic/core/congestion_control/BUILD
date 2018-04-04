@@ -36,7 +36,6 @@ envoy_cc_library(
         "//source/common/quic/core:quic_packets_lib",
         "//source/common/quic/core:quic_time_lib",
         "//source/common/quic/platform/api:quic_bug_tracker_lib",
-        "//source/common/quic/platform/api:quic_containers_lib",
         "//source/common/quic/platform/api:quic_export_lib",
         "//source/common/quic/platform/api:quic_flag_utils_lib",
         "//source/common/quic/platform/api:quic_flags_lib",

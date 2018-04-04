@@ -45,6 +45,7 @@ envoy_cc_library(
         "//source/common/quic/spdy_utils/platform/api:spdy_ptr_util_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_piece_lib",
+        "//source/common/quic/spdy_utils/platform/api:spdy_string_utils_lib",
         "//strings",
         "//util/hash",
     ],

@@ -26,7 +26,6 @@
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/core/quic_stream.h"
 #include "common/quic/core/quic_utils.h"
-#include "common/quic/platform/api/quic_flag_utils.h"
 #include "common/quic/platform/api/quic_flags.h"
 #include "common/quic/platform/api/quic_map_util.h"
 #include "common/quic/platform/api/quic_ptr_util.h"
@@ -43,16 +42,14 @@
 #include "test/common/quic/test_tools/quic_test_utils.h"
 #include "testing/base/public/test_utils.h"
 
+using gfe_spdy::kV3HighestPriority;
+using gfe_spdy::SpdyPriority;
 using testing::_;
 using testing::AtLeast;
 using testing::InSequence;
 using testing::Invoke;
 using testing::Return;
 using testing::StrictMock;
-using gfe_spdy::kV3HighestPriority;
-using gfe_spdy::SpdyPriority;
-
-extern base::Flag<bool> FLAGS_gfe_always_track_codepoints_for_tests;
 
 namespace gfe_quic {
 namespace test {
@@ -114,15 +111,15 @@ class TestCryptoStream : public QuicCryptoStream, public QuicCryptoHandshaker {
 class TestStream : public QuicStream {
  public:
   TestStream(QuicStreamId id, QuicSession* session)
-      : QuicStream(id, session) {
+      : QuicStream(id, session, /*is_static=*/false) {
     if (!session->register_streams_early()) {
-      session->RegisterStreamPriority(id, QuicStream::kDefaultPriority);
+      session->RegisterStreamPriority(id, false, QuicStream::kDefaultPriority);
     }
   }
 
   ~TestStream() override {
     if (!session()->register_streams_early()) {
-      session()->UnregisterStreamPriority(id());
+      session()->UnregisterStreamPriority(id(), false);
     }
   }
 
@@ -285,13 +282,9 @@ class QuicSessionTestBase : public QuicTestWithParam<ParsedQuicVersion> {
     return connection_->transport_version();
   }
 
-  QuicStreamId GetNthClientInitiatedId(int n) {
-    return 3 + 2 * n;
-  }
+  QuicStreamId GetNthClientInitiatedId(int n) { return 3 + 2 * n; }
 
-  QuicStreamId GetNthServerInitiatedId(int n) {
-    return 2 + 2 * n;
-  }
+  QuicStreamId GetNthServerInitiatedId(int n) { return 2 + 2 * n; }
 
   MockQuicConnectionHelper helper_;
   MockAlarmFactory alarm_factory_;
@@ -735,9 +728,6 @@ TEST_P(QuicSessionTestServer, OnCanWriteLimitsNumWritesIfFlowControlBlocked) {
 }
 
 TEST_P(QuicSessionTestServer, SendGoAway) {
-  // ensure that all late-session events are counted
-  bool flag_save = base::GetFlag(FLAGS_gfe_always_track_codepoints_for_tests);
-  base::SetFlag(&FLAGS_gfe_always_track_codepoints_for_tests, true);
   MockPacketWriter* writer = static_cast<MockPacketWriter*>(
       QuicConnectionPeer::GetWriter(session_.connection()));
   EXPECT_CALL(*writer, WritePacket(_, _, _, _, _))
@@ -754,16 +744,7 @@ TEST_P(QuicSessionTestServer, SendGoAway) {
   EXPECT_CALL(*connection_,
               OnStreamReset(kTestStreamId, QUIC_STREAM_PEER_GOING_AWAY))
       .Times(0);
-  // Remember the late-new-stream count prior to the explicit
-  // GetOrCreate... (the test runs several times, so the counter
-  // keeps going up... we want to ensure it goes up by exactly 1
-  // across the call to GetOrCreate...
-  int late_stream_count = QUIC_GET_CODE_COUNT_IMPL(late_new_stream_1_of_1);
   EXPECT_TRUE(session_.GetOrCreateDynamicStream(kTestStreamId));
-  EXPECT_EQ(late_stream_count + 1, QUIC_GET_CODE_COUNT(late_new_stream_1_of_1));
-
-  // restore
-  base::SetFlag(&FLAGS_gfe_always_track_codepoints_for_tests, flag_save);
 }
 
 TEST_P(QuicSessionTestServer, DoNotSendGoAwayTwice) {
@@ -875,22 +856,11 @@ TEST_P(QuicSessionTestServer, HandshakeUnblocksFlowControlBlockedStream) {
   EXPECT_TRUE(session_.IsConnectionFlowControlBlocked());
   EXPECT_TRUE(session_.IsStreamFlowControlBlocked());
 
-  if (!session_.session_unblocks_stream()) {
-    // The handshake message will call OnCanWrite, so the stream can resume
-    // writing.
-    EXPECT_CALL(*stream2, OnCanWrite());
-  }
   // Now complete the crypto handshake, resulting in an increased flow control
   // send window.
   CryptoHandshakeMessage msg;
   session_.GetMutableCryptoStream()->OnHandshakeMessage(msg);
-  if (session_.session_unblocks_stream()) {
-    EXPECT_TRUE(
-        QuicSessionPeer::IsStreamWriteBlocked(&session_, stream2->id()));
-  } else {
-    EXPECT_FALSE(
-        QuicSessionPeer::IsStreamWriteBlocked(&session_, stream2->id()));
-  }
+  EXPECT_TRUE(QuicSessionPeer::IsStreamWriteBlocked(&session_, stream2->id()));
   // Stream is now unblocked.
   EXPECT_FALSE(stream2->flow_controller()->IsBlocked());
   EXPECT_FALSE(session_.IsConnectionFlowControlBlocked());
@@ -928,22 +898,12 @@ TEST_P(QuicSessionTestServer, HandshakeUnblocksFlowControlBlockedCryptoStream) {
   EXPECT_FALSE(session_.HasDataToWrite());
   EXPECT_TRUE(crypto_stream->HasBufferedData());
 
-  if (!session_.session_unblocks_stream()) {
-    // The handshake message will call OnCanWrite, so the stream can
-    // resume writing.
-    EXPECT_CALL(*crypto_stream, OnCanWrite());
-  }
   // Now complete the crypto handshake, resulting in an increased flow control
   // send window.
   CryptoHandshakeMessage msg;
   session_.GetMutableCryptoStream()->OnHandshakeMessage(msg);
-  if (session_.session_unblocks_stream()) {
-    EXPECT_TRUE(
-        QuicSessionPeer::IsStreamWriteBlocked(&session_, kCryptoStreamId));
-  } else {
-    EXPECT_FALSE(
-        QuicSessionPeer::IsStreamWriteBlocked(&session_, kCryptoStreamId));
-  }
+  EXPECT_TRUE(
+      QuicSessionPeer::IsStreamWriteBlocked(&session_, kCryptoStreamId));
   // Stream is now unblocked and will no longer have buffered data.
   EXPECT_FALSE(crypto_stream->flow_controller()->IsBlocked());
   EXPECT_FALSE(session_.IsConnectionFlowControlBlocked());
@@ -1276,12 +1236,61 @@ TEST_P(QuicSessionTestServer, ZombieStreams) {
   EXPECT_CALL(*connection_, SendControlFrame(_));
   EXPECT_CALL(*connection_, OnStreamReset(2, _));
   session_.CloseStream(2);
-  EXPECT_TRUE(QuicContainsKey(session_.zombie_streams(), 2));
-  EXPECT_TRUE(session_.closed_streams()->empty());
+  if (GetQuicReloadableFlag(quic_reset_stream_is_not_zombie)) {
+    EXPECT_FALSE(QuicContainsKey(session_.zombie_streams(), 2));
+    ASSERT_EQ(1u, session_.closed_streams()->size());
+    EXPECT_EQ(2u, session_.closed_streams()->front()->id());
+  } else {
+    EXPECT_TRUE(QuicContainsKey(session_.zombie_streams(), 2));
+    EXPECT_TRUE(session_.closed_streams()->empty());
+  }
   session_.OnStreamDoneWaitingForAcks(2);
   EXPECT_FALSE(QuicContainsKey(session_.zombie_streams(), 2));
   EXPECT_EQ(1u, session_.closed_streams()->size());
   EXPECT_EQ(2u, session_.closed_streams()->front()->id());
+}
+
+// Regression test of b/71548958.
+TEST_P(QuicSessionTestServer, TestZombieStreams) {
+  session_.set_writev_consumes_all_data(true);
+
+  TestStream* stream2 = session_.CreateOutgoingDynamicStream();
+  QuicString body(100, '.');
+  stream2->WriteOrBufferData(body, false, nullptr);
+  EXPECT_TRUE(stream2->IsWaitingForAcks());
+  EXPECT_EQ(1u, QuicStreamPeer::SendBuffer(stream2).size());
+
+  QuicRstStreamFrame rst_frame(kInvalidControlFrameId, stream2->id(),
+                               QUIC_STREAM_CANCELLED, 1234);
+  EXPECT_CALL(*connection_, SendControlFrame(_))
+      .WillOnce(Invoke(&session_, &TestSession::ClearControlFrame));
+  EXPECT_CALL(*connection_,
+              OnStreamReset(stream2->id(), QUIC_RST_ACKNOWLEDGEMENT));
+  stream2->OnStreamReset(rst_frame);
+  if (GetQuicReloadableFlag(quic_reset_stream_is_not_zombie)) {
+    EXPECT_FALSE(QuicContainsKey(session_.zombie_streams(), stream2->id()));
+    ASSERT_EQ(1u, session_.closed_streams()->size());
+    EXPECT_EQ(stream2->id(), session_.closed_streams()->front()->id());
+  } else {
+    // Stream reset by peer, and it becomes zombie stream and the data will be
+    // NEVER be acked because the frames in unacked packet map are removed.
+    EXPECT_TRUE(QuicContainsKey(session_.zombie_streams(), stream2->id()));
+    EXPECT_TRUE(session_.closed_streams()->empty());
+    EXPECT_EQ(1u, QuicStreamPeer::SendBuffer(stream2).size());
+  }
+
+  TestStream* stream4 = session_.CreateOutgoingDynamicStream();
+  EXPECT_CALL(*connection_, SendControlFrame(_)).Times(1);
+  EXPECT_CALL(*connection_,
+              OnStreamReset(stream4->id(), QUIC_STREAM_CANCELLED));
+  stream4->WriteOrBufferData(body, false, nullptr);
+  stream4->Reset(QUIC_STREAM_CANCELLED);
+  EXPECT_FALSE(QuicContainsKey(session_.zombie_streams(), stream4->id()));
+  if (GetQuicReloadableFlag(quic_reset_stream_is_not_zombie)) {
+    EXPECT_EQ(2u, session_.closed_streams()->size());
+  } else {
+    EXPECT_EQ(1u, session_.closed_streams()->size());
+  }
 }
 
 TEST_P(QuicSessionTestServer, OnStreamFrameLost) {

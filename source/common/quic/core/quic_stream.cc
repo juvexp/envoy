@@ -54,7 +54,7 @@ size_t GetReceivedFlowControlWindow(QuicSession* session) {
 // static
 const gfe_spdy::SpdyPriority QuicStream::kDefaultPriority;
 
-QuicStream::QuicStream(QuicStreamId id, QuicSession* session)
+QuicStream::QuicStream(QuicStreamId id, QuicSession* session, bool is_static)
     : sequencer_(this, session->connection()->clock()),
       id_(id),
       session_(session),
@@ -87,11 +87,11 @@ QuicStream::QuicStream(QuicStreamId id, QuicSession* session)
       ack_listener_(nullptr),
       send_buffer_(
           session->connection()->helper()->GetStreamSendBufferAllocator()),
-      buffered_data_threshold_(
-          GetQuicFlag(FLAGS_quic_buffered_data_threshold)) {
+      buffered_data_threshold_(GetQuicFlag(FLAGS_quic_buffered_data_threshold)),
+      is_static_(is_static) {
   SetFromConfig();
   if (session_->register_streams_early()) {
-    session_->RegisterStreamPriority(id, priority_);
+    session_->RegisterStreamPriority(id, is_static_, priority_);
   }
 }
 
@@ -104,7 +104,7 @@ QuicStream::~QuicStream() {
         << ", fin_outstanding: " << fin_outstanding_;
   }
   if (session_ != nullptr && session_->register_streams_early()) {
-    session_->UnregisterStreamPriority(id());
+    session_->UnregisterStreamPriority(id(), is_static_);
   }
 }
 
@@ -294,24 +294,7 @@ void QuicStream::WriteOrBufferData(
 
 void QuicStream::OnCanWrite() {
   if (HasPendingRetransmission()) {
-    const bool session_unblocks_stream = session_->session_unblocks_stream();
     WritePendingRetransmission();
-    if (session_unblocks_stream) {
-      // Exit early to allow other streams to write pending retransmissions if
-      // any.
-      return;
-    }
-    if (HasPendingRetransmission()) {
-      // Stream did not finish retransmission, session will unblock this stream
-      // later.
-      return;
-    }
-    const bool fin_only = !HasBufferedData() && fin_buffered_ && !fin_sent_;
-    if ((!flow_controller_.IsBlocked() && HasBufferedData()) || fin_only) {
-      // Stream finished retransmission. If there is new data which can be sent,
-      // tell the session to unblock this stream later.
-      session_->MarkConnectionLevelWriteBlocked(id_);
-    }
     // Exit early to allow other streams to write pending retransmissions if
     // any.
     return;
@@ -405,8 +388,6 @@ QuicConsumedData QuicStream::WritevData(const struct iovec* iov,
 }
 
 QuicConsumedData QuicStream::WriteMemSlices(QuicMemSliceSpan span, bool fin) {
-  QUIC_FLAG_COUNT(gfe2_reloadable_flag_quic_use_mem_slices);
-  DCHECK(session_->can_use_slices());
   QuicConsumedData consumed_data(0, false);
   if (span.empty() && !fin) {
     QUIC_BUG << "span.empty() && !fin";
@@ -535,6 +516,10 @@ void QuicStream::OnClose() {
     // written on this stream before termination. Done here if needed, using a
     // RST_STREAM frame.
     QUIC_DLOG(INFO) << ENDPOINT << "Sending RST_STREAM in OnClose: " << id();
+    if (GetQuicReloadableFlag(quic_reset_stream_is_not_zombie)) {
+      QUIC_FLAG_COUNT(gfe2_reloadable_flag_quic_reset_stream_is_not_zombie);
+      session_->OnStreamDoneWaitingForAcks(id_);
+    }
     session_->SendRstStream(id(), QUIC_RST_ACKNOWLEDGEMENT,
                             stream_bytes_written());
     rst_sent_ = true;
@@ -556,18 +541,8 @@ void QuicStream::OnClose() {
 
 void QuicStream::OnWindowUpdateFrame(const QuicWindowUpdateFrame& frame) {
   if (flow_controller_.UpdateSendWindowOffset(frame.byte_offset)) {
-    if (session_->session_unblocks_stream()) {
-      QUIC_FLAG_COUNT(gfe2_reloadable_flag_quic_streams_unblocked_by_session2);
-      // Let session unblock this stream.
-      session_->MarkConnectionLevelWriteBlocked(id_);
-    } else {
-      // Writing can be done again!
-      // TODO: This does not respect priorities (e.g. multiple
-      //                outstanding POSTs are unblocked on arrival of
-      //                SHLO with initial window).
-      // As long as the connection is not flow control blocked, write on!
-      OnCanWrite();
-    }
+    // Let session unblock this stream.
+    session_->MarkConnectionLevelWriteBlocked(id_);
   }
 }
 
@@ -610,12 +585,8 @@ void QuicStream::AddBytesConsumed(QuicByteCount bytes) {
 
 void QuicStream::UpdateSendWindowOffset(QuicStreamOffset new_window) {
   if (flow_controller_.UpdateSendWindowOffset(new_window)) {
-    if (session_->session_unblocks_stream()) {
-      // Let session unblock this stream.
-      session_->MarkConnectionLevelWriteBlocked(id_);
-    } else {
-      OnCanWrite();
-    }
+    // Let session unblock this stream.
+    session_->MarkConnectionLevelWriteBlocked(id_);
   }
 }
 

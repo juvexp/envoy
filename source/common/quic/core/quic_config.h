@@ -22,6 +22,7 @@
 #include "common/quic/core/quic_time.h"
 #include "common/quic/platform/api/quic_export.h"
 #include "common/quic/platform/api/quic_string.h"
+#include "common/quic/platform/api/quic_uint128.h"
 
 namespace gfe_quic {
 
@@ -164,15 +165,15 @@ class QUIC_EXPORT_PRIVATE QuicFixedUint128 : public QuicConfigValue {
 
   bool HasSendValue() const;
 
-  absl::uint128 GetSendValue() const;
+  QuicUint128 GetSendValue() const;
 
-  void SetSendValue(absl::uint128 value);
+  void SetSendValue(QuicUint128 value);
 
   bool HasReceivedValue() const;
 
-  absl::uint128 GetReceivedValue() const;
+  QuicUint128 GetReceivedValue() const;
 
-  void SetReceivedValue(absl::uint128 value);
+  void SetReceivedValue(QuicUint128 value);
 
   // If has_send_value is true, serialises |tag_| and |send_value_| to |out|.
   void ToHandshakeMessage(CryptoHandshakeMessage* out) const override;
@@ -183,9 +184,9 @@ class QUIC_EXPORT_PRIVATE QuicFixedUint128 : public QuicConfigValue {
                                  QuicString* error_details) override;
 
  private:
-  absl::uint128 send_value_;
+  QuicUint128 send_value_;
   bool has_send_value_;
-  absl::uint128 receive_value_;
+  QuicUint128 receive_value_;
   bool has_receive_value_;
 };
 
@@ -402,11 +403,11 @@ class QUIC_EXPORT_PRIVATE QuicConfig {
 
   bool SupportMaxHeaderListSize() const;
 
-  void SetStatelessResetTokenToSend(absl::uint128 stateless_reset_token);
+  void SetStatelessResetTokenToSend(QuicUint128 stateless_reset_token);
 
   bool HasReceivedStatelessResetToken() const;
 
-  absl::uint128 ReceivedStatelessResetToken() const;
+  QuicUint128 ReceivedStatelessResetToken() const;
 
   bool negotiated() const;
 

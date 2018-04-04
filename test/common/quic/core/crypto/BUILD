@@ -108,6 +108,7 @@ envoy_cc_test(
         "//source/common/quic/platform/api:quic_string_lib",
         "//test/common/quic/platform/api:quic_test_lib",
         "//test/common/quic/test_tools:quic_test_utils",
+        "//net/base:ipaddress",
         "//net/http2/server/lib/public:server",
         "//net/httpsconnection:sslconnectionbase",
         "//security/mentat/lib/internal:tls_oracle_signing_impl",

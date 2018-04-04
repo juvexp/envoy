@@ -162,7 +162,7 @@ CppLineType IdentifyCppLineType(QuicStringPiece line) {
 
 util::StatusOr<QuicString> ParseCharLiteralsInLine(QuicStringPiece line,
                                                    bool* comma_at_end) {
-  CHECK_NOTNULL(comma_at_end);
+  CHECK(comma_at_end != nullptr);
   QuicString result;
   line = SkipLeadingBlanks(line);
   while (!line.empty()) {
@@ -834,7 +834,7 @@ class FileFormatter {
             // because this formatter is emitting a comment at the end of each
             // line, preventing clang-format from combining adjacent lines.
             do_emit_clang_format_off_ = false;
-            line_prefix_ = GetLeadingBlanks(input_line).ToString() + "    ";
+            line_prefix_ = string(GetLeadingBlanks(input_line)) + "    ";
             return true;
           }
           break;

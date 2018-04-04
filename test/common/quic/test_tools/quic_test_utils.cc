@@ -37,8 +37,8 @@
 #include "common/quic/spdy_utils/core/spdy_frame_builder.h"
 #include "third_party/openssl/sha.h"
 
-using testing::Invoke;
 using testing::_;
+using testing::Invoke;
 
 namespace gfe_quic {
 namespace test {
@@ -383,9 +383,14 @@ void PacketSavingConnection::SendOrQueuePacket(SerializedPacket* packet) {
 }
 
 MockQuicSession::MockQuicSession(QuicConnection* connection)
+    : MockQuicSession(connection, true) {}
+
+MockQuicSession::MockQuicSession(QuicConnection* connection,
+                                 bool create_mock_crypto_stream)
     : QuicSession(connection, nullptr, DefaultQuicConfig()) {
-  crypto_stream_ = QuicMakeUnique<MockQuicCryptoStream>(this);
-  Initialize();
+  if (create_mock_crypto_stream) {
+    crypto_stream_ = QuicMakeUnique<MockQuicCryptoStream>(this);
+  }
   ON_CALL(*this, WritevData(_, _, _, _, _))
       .WillByDefault(testing::Return(QuicConsumedData(0, false)));
 }
@@ -400,6 +405,10 @@ QuicCryptoStream* MockQuicSession::GetMutableCryptoStream() {
 
 const QuicCryptoStream* MockQuicSession::GetCryptoStream() const {
   return crypto_stream_.get();
+}
+
+void MockQuicSession::SetCryptoStream(QuicCryptoStream* crypto_stream) {
+  crypto_stream_.reset(crypto_stream);
 }
 
 // static
@@ -441,9 +450,15 @@ CryptoMessageParser* MockQuicCryptoStream::crypto_message_parser() {
 }
 
 MockQuicSpdySession::MockQuicSpdySession(QuicConnection* connection)
+    : MockQuicSpdySession(connection, true) {}
+
+MockQuicSpdySession::MockQuicSpdySession(QuicConnection* connection,
+                                         bool create_mock_crypto_stream)
     : QuicSpdySession(connection, nullptr, DefaultQuicConfig()) {
-  crypto_stream_ = QuicMakeUnique<MockQuicCryptoStream>(this);
-  Initialize();
+  if (create_mock_crypto_stream) {
+    crypto_stream_ = QuicMakeUnique<MockQuicCryptoStream>(this);
+  }
+
   ON_CALL(*this, WritevData(_, _, _, _, _))
       .WillByDefault(testing::Return(QuicConsumedData(0, false)));
 }
@@ -458,6 +473,10 @@ QuicCryptoStream* MockQuicSpdySession::GetMutableCryptoStream() {
 
 const QuicCryptoStream* MockQuicSpdySession::GetCryptoStream() const {
   return crypto_stream_.get();
+}
+
+void MockQuicSpdySession::SetCryptoStream(QuicCryptoStream* crypto_stream) {
+  crypto_stream_.reset(crypto_stream);
 }
 
 size_t MockQuicSpdySession::WriteHeaders(
@@ -651,7 +670,7 @@ QuicEncryptedPacket* ConstructEncryptedPacket(QuicConnectionId connection_id,
                                               const string& data) {
   return ConstructEncryptedPacket(
       connection_id, version_flag, reset_flag, packet_number, data,
-      PACKET_8BYTE_CONNECTION_ID, PACKET_6BYTE_PACKET_NUMBER);
+      PACKET_8BYTE_CONNECTION_ID, PACKET_4BYTE_PACKET_NUMBER);
 }
 
 QuicEncryptedPacket* ConstructEncryptedPacket(

@@ -35,7 +35,7 @@ namespace {
 
 // Stateless reset token used in IETF public reset packet.
 // TODO: use a real stateless reset token instead of a hard code one.
-const absl::uint128 kStatelessResetToken = 1010101;
+const QuicUint128 kStatelessResetToken = 1010101;
 
 }  // namespace
 
@@ -47,6 +47,11 @@ QuicSession::QuicSession(QuicConnection* connection,
                          const QuicConfig& config)
     : connection_(connection),
       visitor_(owner),
+      register_streams_early_(
+          GetQuicReloadableFlag(quic_register_streams_early2)),
+      write_blocked_streams_(
+          GetQuicReloadableFlag(quic_register_static_streams) &&
+          register_streams_early_),
       config_(config),
       max_open_outgoing_streams_(kDefaultMaxStreamsPerConnection),
       max_open_incoming_streams_(config_.GetMaxIncomingDynamicStreamsToSend()),
@@ -68,14 +73,9 @@ QuicSession::QuicSession(QuicConnection* connection,
       currently_writing_stream_id_(0),
       goaway_sent_(false),
       goaway_received_(false),
-      control_frame_manager_(this),
-      can_use_slices_(GetQuicReloadableFlag(quic_use_mem_slices)),
-      session_unblocks_stream_(
-          GetQuicReloadableFlag(quic_streams_unblocked_by_session2)),
-      register_streams_early_(
-          GetQuicReloadableFlag(quic_register_streams_early)) {
+      control_frame_manager_(this) {
   if (register_streams_early()) {
-    QUIC_FLAG_COUNT(gfe2_reloadable_flag_quic_register_streams_early);
+    QUIC_FLAG_COUNT(gfe2_reloadable_flag_quic_register_streams_early2);
   }
 }
 
@@ -225,6 +225,8 @@ void QuicSession::OnPathDegrading() {}
 bool QuicSession::AllowSelfAddressChange() const {
   return false;
 }
+
+void QuicSession::OnForwardProgressConfirmed() {}
 
 void QuicSession::OnWindowUpdateFrame(const QuicWindowUpdateFrame& frame) {
   // Stream may be closed by the time we receive a WINDOW_UPDATE, so we can't
@@ -744,20 +746,32 @@ void QuicSession::OnCryptoHandshakeMessageReceived(
     const CryptoHandshakeMessage& /*message*/) {}
 
 void QuicSession::RegisterStreamPriority(QuicStreamId id,
+                                         bool is_static,
                                          SpdyPriority priority) {
+  // Static streams should not be registered unless register_streams_early
+  // is true.
+  DCHECK(register_streams_early() || !is_static);
   // Static streams do not need to be registered with the write blocked list,
   // since it has special handling for them.
-  if (!register_streams_early() || !QuicContainsKey(static_stream_map_, id)) {
-    write_blocked_streams()->RegisterStream(id, priority);
+  if (!write_blocked_streams()->register_static_streams() &&
+      register_streams_early() && is_static) {
+    return;
   }
+
+  write_blocked_streams()->RegisterStream(id, is_static, priority);
 }
 
-void QuicSession::UnregisterStreamPriority(QuicStreamId id) {
+void QuicSession::UnregisterStreamPriority(QuicStreamId id, bool is_static) {
+  // Static streams should not be registered unless register_streams_early
+  // is true.
+  DCHECK(register_streams_early() || !is_static);
   // Static streams do not need to be registered with the write blocked list,
   // since it has special handling for them.
-  if (!register_streams_early() || !QuicContainsKey(static_stream_map_, id)) {
-    write_blocked_streams()->UnregisterStream(id);
+  if (!write_blocked_streams()->register_static_streams() &&
+      register_streams_early() && is_static) {
+    return;
   }
+  write_blocked_streams()->UnregisterStream(id, is_static);
 }
 
 void QuicSession::UpdateStreamPriority(QuicStreamId id,
@@ -850,14 +864,6 @@ bool QuicSession::ShouldYield(QuicStreamId stream_id) {
   return write_blocked_streams()->ShouldYield(stream_id);
 }
 
-void QuicSession::NeuterUnencryptedStreamData() {
-  QuicCryptoStream* crypto_stream = GetMutableCryptoStream();
-  crypto_stream->NeuterUnencryptedStreamData();
-  if (!crypto_stream->HasPendingRetransmission()) {
-    streams_with_pending_retransmission_.erase(kCryptoStreamId);
-  }
-}
-
 QuicStream* QuicSession::GetOrCreateDynamicStream(
     const QuicStreamId stream_id) {
   DCHECK(!QuicContainsKey(static_stream_map_, stream_id))
@@ -877,15 +883,11 @@ QuicStream* QuicSession::GetOrCreateDynamicStream(
     return nullptr;
   }
 
-  // If we have a streamid that would want us to make a new stream
-  // and we've sent a goaway, we should ignore the stream creation.
-  // Have to see how often it occurs; for now log+count it.
-  // Later, if it's not too infrequent, will change this to
-  // Do The Right Thing.
-  if (goaway_sent_) {
-    QUIC_CODE_COUNT(late_new_stream);
-    // /*de-comment to Do The Right Thing*/    return nullptr;
-  }
+  // TODO: If we are creating a new stream and we have
+  // sent a goaway, we should ignore the stream creation. Need to
+  // add code to A) test if goaway was sent ("if (goaway_sent_)") and
+  // B) reject stream creation ("return nullptr")
+
   available_streams_.erase(stream_id);
 
   if (!MaybeIncreaseLargestPeerStreamId(stream_id)) {
@@ -949,6 +951,9 @@ size_t QuicSession::GetNumOpenIncomingStreams() const {
 }
 
 size_t QuicSession::GetNumOpenOutgoingStreams() const {
+  DCHECK_GE(GetNumDynamicOutgoingStreams() +
+                GetNumLocallyClosedOutgoingStreamsHighestOffset(),
+            GetNumDrainingOutgoingStreams());
   return GetNumDynamicOutgoingStreams() +
          GetNumLocallyClosedOutgoingStreamsHighestOffset() -
          GetNumDrainingOutgoingStreams();
@@ -1171,7 +1176,7 @@ bool QuicSession::WriteStreamData(QuicStreamId id,
   return stream->WriteStreamData(offset, data_length, writer);
 }
 
-absl::uint128 QuicSession::GetStatelessResetToken() const {
+QuicUint128 QuicSession::GetStatelessResetToken() const {
   return kStatelessResetToken;
 }
 

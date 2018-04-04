@@ -43,7 +43,7 @@ PushedMessageInterface::~PushedMessageInterface() {}
 ConcreteMessageBase::ConcreteMessageBase(const NamesAndValues& headers,
                                          QuicStringPiece body,
                                          const NamesAndValues& trailers)
-    : headers_(headers), trailers_(trailers), body_(body.ToString()) {}
+    : headers_(headers), trailers_(trailers), body_(body) {}
 ConcreteMessageBase::~ConcreteMessageBase() {}
 
 RequestMessage::RequestMessage(const NamesAndValues& headers,

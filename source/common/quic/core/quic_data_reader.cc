@@ -14,7 +14,6 @@
 
 #include "common/quic/core/quic_data_reader.h"
 
-#include "base/int128.h"
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/core/quic_utils.h"
 #include "common/quic/platform/api/quic_bug_tracker.h"
@@ -280,7 +279,7 @@ bool QuicDataReader::ReadVarIntStreamId(QuicStreamId* result) {
   if (!this->ReadVarInt62(&temp_uint64)) {
     return false;
   }
-  if (temp_uint64 > kMaxStreamId) {
+  if (temp_uint64 > kMaxQuicStreamId) {
     return false;
   }
   *result = static_cast<QuicStreamId>(temp_uint64);

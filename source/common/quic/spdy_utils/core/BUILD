@@ -159,6 +159,7 @@ envoy_cc_library(
     visibility = [
         "//gfe/gfe2:gfe2_internal",
         "//gfe/http2/tools:__pkg__",
+        "//gfe/lib:__subpackages__",
         "//source/common/quic:__subpackages__",
         "//source/common/quic/spdy_utils:__subpackages__",
         "//net/grpc/internal/src/core/quic:__pkg__",
@@ -261,7 +262,6 @@ envoy_cc_library(
         ":spdy_header_block_lib",
         "//base",
         "//source/common/quic/spdy_utils/platform/api:spdy_export_lib",
-        "//source/common/quic/spdy_utils/platform/api:spdy_flags_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_ptr_util_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_lib",
         "//source/common/quic/spdy_utils/platform/api:spdy_string_piece_lib",

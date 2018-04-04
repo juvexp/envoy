@@ -69,11 +69,6 @@ class ServerThread : public Thread {
   // Returns the port that the server is listening on.
   int GetPort();
 
-  // Schedules the server to send a go-away
-  // Set bool wait_for_transmit to true of the client should wait
-  // for the server to send the goaway.
-  void SendGoAway(bool wait_for_transmit);
-
  private:
   void MaybeNotifyOfHandshakeConfirmation();
   void ExecuteScheduledActions();
@@ -84,8 +79,6 @@ class ServerThread : public Thread {
   absl::Notification paused_;       // Notitied when the server has paused
   absl::Notification resume_;       // Notified when the server should resume.
   absl::Notification quit_;         // Notified when the server should quit.
-  absl::Notification goaway_sent_;  // Server can notify client that the
-                                    //  goaway has been sent.
 
   std::unique_ptr<QuicServer> server_;
   QuicSocketAddress address_;

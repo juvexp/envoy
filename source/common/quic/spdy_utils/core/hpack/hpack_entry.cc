@@ -16,7 +16,7 @@
 
 #include "base/logging.h"
 #include "common/quic/spdy_utils/platform/api/spdy_estimate_memory_usage.h"
-#include "strings/numbers.h"
+#include "common/quic/spdy_utils/platform/api/spdy_string_utils.h"
 
 namespace gfe_spdy {
 
@@ -82,11 +82,10 @@ size_t HpackEntry::Size() const {
 }
 
 SpdyString HpackEntry::GetDebugString() const {
-  return "{ name: \"" + SpdyString(name_ref_) + "\", value: \"" +
-         SpdyString(value_ref_) +
-         "\", index: " + strings::SimpleItoa(insertion_index_) +
-         (IsStatic() ? " static" : (IsLookup() ? " lookup" : " dynamic")) +
-         " }";
+  return SpdyStringPrintf(
+      "{ name: \"%.*s\", value: \"%.*s\", index: %d %s }", name_ref_.size(),
+      name_ref_.data(), value_ref_.size(), value_ref_.data(), insertion_index_,
+      (IsStatic() ? " static" : (IsLookup() ? " lookup" : " dynamic")));
 }
 
 size_t HpackEntry::EstimateMemoryUsage() const {

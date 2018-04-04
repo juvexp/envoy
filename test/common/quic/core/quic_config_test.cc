@@ -21,6 +21,7 @@
 #include "common/quic/core/quic_utils.h"
 #include "common/quic/platform/api/quic_string.h"
 #include "test/common/quic/platform/api/quic_test.h"
+#include "common/quic/platform/api/quic_uint128.h"
 #include "test/common/quic/test_tools/quic_config_peer.h"
 #include "test/common/quic/test_tools/quic_test_utils.h"
 
@@ -115,7 +116,7 @@ TEST_F(QuicConfigTest, ProcessServerHello) {
   QuicIpAddress host;
   host.FromString("127.0.3.1");
   const QuicSocketAddress kTestServerAddress = QuicSocketAddress(host, 1234);
-  const absl::uint128 kTestResetToken = 10111100001;
+  const QuicUint128 kTestResetToken = MakeQuicUint128(0, 10111100001);
   QuicConfig server_config;
   QuicTagVector cgst;
   cgst.push_back(kQBIC);

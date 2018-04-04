@@ -58,6 +58,7 @@
 #include "common/quic/platform/api/quic_text_utils.h"
 #include "common/quic/platform/api/quic_url.h"
 #include "common/quic/tools/quic_client.h"
+#include "net/base/ipaddress.h"
 #include "net/dns/hostlookup.h"
 
 class FakeProofVerifier : public gfe_quic::ProofVerifier {
