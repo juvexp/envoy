@@ -158,6 +158,9 @@ class QuicDispatcher : public QuicTimeWaitListManager::Visitor,
   bool OnWindowUpdateFrame(const QuicWindowUpdateFrame& frame) override;
   bool OnBlockedFrame(const QuicBlockedFrame& frame) override;
   void OnPacketComplete() override;
+  bool IsValidStatelessResetToken(absl::uint128 token) const override;
+  void OnAuthenticatedIetfStatelessResetPacket(
+      const QuicIetfStatelessResetPacket& packet) override;
 
   // QuicBufferedPacketStore::VisitorInterface implementation.
   void OnExpiredPackets(QuicConnectionId connection_id,

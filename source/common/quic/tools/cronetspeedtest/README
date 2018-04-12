@@ -31,9 +31,16 @@ Instructions for Shortleash:
 https://support.google.com/techstop/answer/2675487?hl=en
 
 Setup instructions:
-1. Create a local directory. For example, mkdir cronetspeedtest.
+1.Create a local directory. For example, mkdir cronetspeedtest.
+  CRONETSPEEDTESTDIR=$HOME/cronetspeedtest
+  mkdir $CRONETSPEEDTESTDIR
+
 2. cd to the newly-created directory.
-3. Run /google/src/head/depot/google3/gfe/quic/tools/cronetspeedtest/setup.py <clankium_src_dir> <simpleperf_scripts_dir>
+  cd $CRONETSPEEDTESTDIR
+
+3. [ EDIT setup.py to set DEPOT_BASE_DIR correctly ]
+   Run /google/src/head/depot/google3/gfe/quic/tools/cronetspeedtest/setup.py <clankium_src_dir> <simpleperf_scripts_dir>
+
 4. Run ./setup_clankium_repo.py
   This will generate two build directories:
     out/cronetspeedtest_arm64
@@ -44,21 +51,43 @@ Setup instructions:
 5. Connect Android device via USB, run ./setup_device_certs.sh
 
 Benchmarking instructions:
+
+0. Make sure shortleash is setup.  First with USB connected, run the
+   following:
+   adb devices
+   adb root
+   adb tcpip 5555
+
+   to verify device is there and prepare for connecting to shortleash
+   then connect shortleash, and run:
+
+   adb connect 172.16.243.160
+
+   It's possible ip address may be different, refer to shortleash
+   instructions if so.
+
 1. Create a g4 client.
-2. From the g4 client, run path/to/cronetspeedtest/bin/build_and_run_servers.sh
-  This starts up the Scotty server and multiple GFEs in the background.
-3. From the g4 client, run build_and_copy_cronet.py.
-  This will build cronet from the local clankium repo and copy the compiled
-  libcronet files into the g4 client.
-4. From the g4 client, run build_and_install_app.sh.
-  This will build the Android app using the compiled libcronet files and load it
-  onto the Android device.
+   g4d -f cronetspeedtest
+   cd google3
+
+2. run CRONETSPEEDTESTDIR/bin/build_and_run_servers.sh
+   This starts up the Scotty server and multiple GFEs in the background.
+
+3. run CRONETSPEEDTESTDIR/bin/build_and_copy_cronet.py.
+   This will build cronet from the local clankium repo and copy the
+   compiled libcronet files into the g4 client.
+
+4. run CRONETSPEEDTESTDIR/bin/build_and_install_app.sh.
+   This will build the Android app using the compiled libcronet files
+   and load it onto the Android device.
+
 5. From somewhere outside the g4 client, run run_benchmark.py.
-  This will start the app on the device and start an upload/download. While the
-  transfer occurs, the script will record transfer rate and run Simpleperf on the
-  app. When finished, it will save its results and the Simpleperf profile to
-  path/to/cronetspeedtest/results. The file pprof.profile can be viewed at
-  https://pprof.corp.google.com.
+   This will start the app on the device and start an
+   upload/download. While the transfer occurs, the script will record
+   transfer rate and run Simpleperf on the app. When finished, it will
+   save its results and the Simpleperf profile to
+   path/to/cronetspeedtest/results. The file pprof.profile can be
+   viewed at https://pprof.corp.google.com.
 
 After making changes in the clankium repo, do steps 3 through 5 to benchmark
 cronet with the new changes.

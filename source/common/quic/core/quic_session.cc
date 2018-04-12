@@ -415,6 +415,14 @@ QuicConsumedData QuicSession::WritevData(QuicStream* stream,
     // up write blocked until OnCanWrite is next called.
     return QuicConsumedData(0, false);
   }
+  if (connection_->encryption_level() != ENCRYPTION_FORWARD_SECURE) {
+    // Set the next sending packets' long header type.
+    QuicLongHeaderType type = ZERO_RTT_PROTECTED;
+    if (id == kCryptoStreamId) {
+      type = GetCryptoStream()->GetLongHeaderType(offset);
+    }
+    connection_->SetLongHeaderType(type);
+  }
   QuicConsumedData data =
       connection_->SendStreamData(id, write_length, offset, state);
   if (offset >= stream->stream_bytes_written()) {
@@ -477,14 +485,14 @@ void QuicSession::InsertLocallyClosedStreamsHighestOffset(
 }
 
 void QuicSession::CloseStreamInner(QuicStreamId stream_id, bool locally_reset) {
-  QUIC_DLOG(INFO) << ENDPOINT << "Closing stream " << stream_id;
+  QUIC_DVLOG(1) << ENDPOINT << "Closing stream " << stream_id;
 
   DynamicStreamMap::iterator it = dynamic_stream_map_.find(stream_id);
   if (it == dynamic_stream_map_.end()) {
     // When CloseStreamInner has been called recursively (via
     // QuicStream::OnClose), the stream will already have been deleted
     // from stream_map_, so return immediately.
-    QUIC_DLOG(INFO) << ENDPOINT << "Stream is already closed: " << stream_id;
+    QUIC_DVLOG(1) << ENDPOINT << "Stream is already closed: " << stream_id;
     return;
   }
   QuicStream* stream = it->second.get();
@@ -569,7 +577,8 @@ void QuicSession::OnConfigNegotiated() {
   connection_->SetFromConfig(config_);
 
   uint32_t max_streams = 0;
-  if (config_.HasReceivedMaxIncomingDynamicStreams()) {
+  if (config_.do_not_use_mspc() ||
+      config_.HasReceivedMaxIncomingDynamicStreams()) {
     max_streams = config_.ReceivedMaxIncomingDynamicStreams();
   } else {
     max_streams = config_.MaxStreamsPerConnection();
@@ -785,8 +794,8 @@ QuicConfig* QuicSession::config() {
 
 void QuicSession::ActivateStream(std::unique_ptr<QuicStream> stream) {
   QuicStreamId stream_id = stream->id();
-  QUIC_DLOG(INFO) << ENDPOINT << "num_streams: " << dynamic_stream_map_.size()
-                  << ". activating " << stream_id;
+  QUIC_DVLOG(1) << ENDPOINT << "num_streams: " << dynamic_stream_map_.size()
+                << ". activating " << stream_id;
   DCHECK(!QuicContainsKey(dynamic_stream_map_, stream_id));
   DCHECK(!QuicContainsKey(static_stream_map_, stream_id));
   dynamic_stream_map_[stream_id] = std::move(stream);

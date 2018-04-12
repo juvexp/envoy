@@ -27,12 +27,13 @@ class QUIC_EXPORT_PRIVATE QuicEncrypter {
  public:
   virtual ~QuicEncrypter() {}
 
-  static QuicEncrypter* Create(QuicTag algorithm);
+  static std::unique_ptr<QuicEncrypter> Create(QuicTag algorithm);
 
   // Creates an IETF QuicEncrypter based on |cipher_suite| which must be an id
   // returned by SSL_CIPHER_get_id. The caller is responsible for taking
   // ownership of the new QuicEncrypter.
-  static QuicEncrypter* CreateFromCipherSuite(uint32_t cipher_suite);
+  static std::unique_ptr<QuicEncrypter> CreateFromCipherSuite(
+      uint32_t cipher_suite);
 
   // Sets the encryption key. Returns true on success, false on failure.
   //

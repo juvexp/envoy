@@ -12,6 +12,7 @@ load(
 
 envoy_package()
 
+
 envoy_cc_test(
     name = "quic_ref_counted_test",
     srcs = ["quic_reference_counted_test.cc"],
@@ -67,7 +68,7 @@ envoy_cc_test_library(
         "quic_test.h",
     ],
     deps = [
-        "//gfe/quic/platform/impl:quic_test_impl_lib_no_google3",
+        "//test/common/quic/platform/impl:quic_test_impl_lib_no_google3",
     ],
 )
 
@@ -108,7 +109,7 @@ envoy_cc_test_library(
         "quic_test_loopback.h",
     ],
     deps = [
-        "//gfe/quic/platform/impl:quic_test_loopback_impl_lib",
+        "//test/common/quic/platform/impl:quic_test_loopback_impl_lib",
     ],
 )
 
@@ -129,7 +130,7 @@ envoy_cc_test_library(
     ],
     deps = [
         "//source/common/quic/platform/api:quic_mem_slice_span_lib",
-        "//gfe/quic/platform/impl:quic_test_mem_slice_vector_impl_lib",
+        "//test/common/quic/platform/impl:quic_test_mem_slice_vector_impl_lib",
     ],
 )
 

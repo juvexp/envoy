@@ -35,6 +35,7 @@
 
 #include "base/macros.h"
 #include "common/quic/core/crypto/quic_decrypter.h"
+#include "common/quic/core/crypto/quic_encrypter.h"
 #include "common/quic/core/proto/cached_network_parameters.proto.h"
 #include "common/quic/core/quic_alarm.h"
 #include "common/quic/core/quic_alarm_factory.h"
@@ -61,8 +62,6 @@ namespace gfe_quic {
 class QuicClock;
 class QuicConfig;
 class QuicConnection;
-class QuicDecrypter;
-class QuicEncrypter;
 class QuicRandom;
 
 namespace test {
@@ -485,6 +484,9 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   bool OnWindowUpdateFrame(const QuicWindowUpdateFrame& frame) override;
   bool OnBlockedFrame(const QuicBlockedFrame& frame) override;
   void OnPacketComplete() override;
+  bool IsValidStatelessResetToken(absl::uint128 token) const override;
+  void OnAuthenticatedIetfStatelessResetPacket(
+      const QuicIetfStatelessResetPacket& packet) override;
 
   // QuicConnectionCloseDelegateInterface
   void OnUnrecoverableError(QuicErrorCode error,
@@ -620,9 +622,9 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   // connection becomes forward secure and hasn't received acks for all packets.
   void NeuterUnencryptedPackets();
 
-  // Changes the encrypter used for level |level| to |encrypter|. The function
-  // takes ownership of |encrypter|.
-  void SetEncrypter(EncryptionLevel level, QuicEncrypter* encrypter);
+  // Changes the encrypter used for level |level| to |encrypter|.
+  void SetEncrypter(EncryptionLevel level,
+                    std::unique_ptr<QuicEncrypter> encrypter);
 
   // SetNonceForPublicHeader sets the nonce that will be transmitted in the
   // header of each packet encrypted at the initial encryption level decrypted.
@@ -633,21 +635,22 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   // to new packets.
   void SetDefaultEncryptionLevel(EncryptionLevel level);
 
-  // SetDecrypter sets the primary decrypter, replacing any that already exists,
-  // and takes ownership. If an alternative decrypter is in place then the
-  // function DCHECKs. This is intended for cases where one knows that future
-  // packets will be using the new decrypter and the previous decrypter is now
-  // obsolete. |level| indicates the encryption level of the new decrypter.
-  void SetDecrypter(EncryptionLevel level, QuicDecrypter* decrypter);
+  // SetDecrypter sets the primary decrypter, replacing any that already exists.
+  // If an alternative decrypter is in place then the function DCHECKs. This is
+  // intended for cases where one knows that future packets will be using the
+  // new decrypter and the previous decrypter is now obsolete. |level| indicates
+  // the encryption level of the new decrypter.
+  void SetDecrypter(EncryptionLevel level,
+                    std::unique_ptr<QuicDecrypter> decrypter);
 
   // SetAlternativeDecrypter sets a decrypter that may be used to decrypt
-  // future packets and takes ownership of it. |level| indicates the encryption
-  // level of the decrypter. If |latch_once_used| is true, then the first time
-  // that the decrypter is successful it will replace the primary decrypter.
-  // Otherwise both decrypters will remain active and the primary decrypter
-  // will be the one last used.
+  // future packets. |level| indicates the encryption level of the decrypter. If
+  // |latch_once_used| is true, then the first time that the decrypter is
+  // successful it will replace the primary decrypter.  Otherwise both
+  // decrypters will remain active and the primary decrypter will be the one
+  // last used.
   void SetAlternativeDecrypter(EncryptionLevel level,
-                               QuicDecrypter* decrypter,
+                               std::unique_ptr<QuicDecrypter> decrypter,
                                bool latch_once_used);
 
   const QuicDecrypter* decrypter() const;
@@ -729,6 +732,9 @@ class QUIC_EXPORT_PRIVATE QuicConnection
 
   // Set transmission type of next sending packets.
   void SetTransmissionType(TransmissionType type);
+
+  // Set long header type of next sending packets.
+  void SetLongHeaderType(QuicLongHeaderType type);
 
   // Return the id of the cipher of the primary decrypter of the framer.
   uint32_t cipher_id() const { return framer_.decrypter()->cipher_id(); }
@@ -1003,6 +1009,11 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   // Contents received in the current packet, especially used to identify
   // whether the current packet is a padded PING packet.
   PacketContent current_packet_content_;
+  // True if the packet currently being processed is a connectivity probing
+  // packet. Is set to false when a new packet is received, and will be set to
+  // true as soon as |current_packet_content_| is set to
+  // SECOND_FRAME_IS_PADDING.
+  bool is_current_packet_connectivity_probing_;
   // Caches the current peer migration type if a peer migration might be
   // initiated. As soon as the current packet is confirmed not a connectivity
   // probe, peer migration will start.
@@ -1172,7 +1183,7 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   // An alarm that is scheduled when the connection can still write and there
   // may be more data to send.
   // TODO: Remove resume_writes_alarm when deprecating
-  // FLAGS_gfe2_reloadable_flag_quic_only_one_sending_alarm
+  // FLAGS_gfe2_reloadable_flag_quic_unified_send_alarm
   QuicArenaScopedPtr<QuicAlarm> resume_writes_alarm_;
   // An alarm that fires when the connection may have timed out.
   QuicArenaScopedPtr<QuicAlarm> timeout_alarm_;
@@ -1294,6 +1305,12 @@ class QUIC_EXPORT_PRIVATE QuicConnection
   // used to safeguard against an accidental tail recursion in probing
   // retransmission code.
   bool probing_retransmission_pending_;
+
+  // Indicates whether a stateless reset token has been received from peer.
+  bool stateless_reset_token_received_;
+  // Stores received stateless reset token from peer. Used to verify whether a
+  // packet is a stateless reset packet.
+  absl::uint128 received_stateless_reset_token_;
 
   // Id of latest sent control frame. 0 if no control frame has been sent.
   QuicControlFrameId last_control_frame_id_;

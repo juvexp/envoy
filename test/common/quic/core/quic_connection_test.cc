@@ -323,7 +323,8 @@ class TestPacketWriter : public QuicPacketWriter {
     }
 
     if (use_tagging_decrypter_) {
-      framer_.framer()->SetDecrypter(ENCRYPTION_NONE, new TaggingDecrypter);
+      framer_.framer()->SetDecrypter(ENCRYPTION_NONE,
+                                     QuicMakeUnique<TaggingDecrypter>());
     }
     EXPECT_TRUE(framer_.ProcessPacket(packet));
     if (block_on_next_write_) {
@@ -507,7 +508,8 @@ class TestConnection : public QuicConnection {
                        SupportedVersions(version)),
         notifier_(nullptr) {
     writer->set_perspective(perspective);
-    SetEncrypter(ENCRYPTION_FORWARD_SECURE, new NullEncrypter(perspective));
+    SetEncrypter(ENCRYPTION_FORWARD_SECURE,
+                 QuicMakeUnique<NullEncrypter>(perspective));
     SetDataProducer(&producer_);
   }
 
@@ -686,6 +688,7 @@ class TestConnection : public QuicConnection {
     next_effective_peer_addr_ = QuicMakeUnique<QuicSocketAddress>(addr);
   }
 
+  using QuicConnection::IsCurrentPacketConnectivityProbing;
   using QuicConnection::SelectMutualVersion;
   using QuicConnection::SendProbingRetransmissions;
   using QuicConnection::set_defer_send_in_response_to_packets;
@@ -745,9 +748,13 @@ std::vector<TestParams> GetTestParams() {
   for (size_t i = 0; i < all_supported_versions.size(); ++i) {
     for (AckResponse ack_response :
          {AckResponse::kDefer, AckResponse::kImmediate}) {
-      for (bool stop_waiting : {true, false}) {
-        params.push_back(
-            TestParams(all_supported_versions[i], ack_response, stop_waiting));
+      for (bool no_stop_waiting : {true, false}) {
+        // After version 43, never use STOP_WAITING.
+        if (all_supported_versions[i].transport_version <= QUIC_VERSION_43 ||
+            no_stop_waiting) {
+          params.push_back(TestParams(all_supported_versions[i], ack_response,
+                                      no_stop_waiting));
+        }
       }
     }
   }
@@ -792,8 +799,12 @@ class QuicConnectionTest : public QuicTestWithParam<TestParams> {
     SetQuicFlag(&FLAGS_quic_supports_tls_handshake, true);
     connection_.set_defer_send_in_response_to_packets(GetParam().ack_response ==
                                                       AckResponse::kDefer);
-    QuicConnectionPeer::SetNoStopWaitingFrames(&connection_,
-                                               GetParam().no_stop_waiting);
+    if (version().transport_version > QUIC_VERSION_43) {
+      EXPECT_TRUE(QuicConnectionPeer::GetNoStopWaitingFrames(&connection_));
+    } else {
+      QuicConnectionPeer::SetNoStopWaitingFrames(&connection_,
+                                                 GetParam().no_stop_waiting);
+    }
     connection_.set_visitor(&visitor_);
     if (connection_.session_decides_what_to_write()) {
       connection_.SetSessionNotifier(&notifier_);
@@ -1481,6 +1492,8 @@ TEST_P(QuicConnectionTest, ReceivePaddedPingAtServer) {
       clock_.Now()));
 
   ProcessReceivedPacket(kSelfAddress, kPeerAddress, *received);
+
+  EXPECT_FALSE(connection_.IsCurrentPacketConnectivityProbing());
   EXPECT_EQ(kPeerAddress, connection_.peer_address());
   if (GetQuicReloadableFlag(quic_enable_server_proxy)) {
     EXPECT_EQ(kPeerAddress, connection_.effective_peer_address());
@@ -1598,6 +1611,8 @@ TEST_P(QuicConnectionTest, ReceiveConnectivityProbingAtServer) {
       clock_.Now()));
 
   ProcessReceivedPacket(kSelfAddress, kNewPeerAddress, *received);
+
+  EXPECT_TRUE(connection_.IsCurrentPacketConnectivityProbing());
   EXPECT_EQ(kPeerAddress, connection_.peer_address());
   if (GetQuicReloadableFlag(quic_enable_server_proxy)) {
     EXPECT_EQ(kPeerAddress, connection_.effective_peer_address());
@@ -1718,6 +1733,7 @@ TEST_P(QuicConnectionTest, ReceivePaddedPingAtClient) {
       clock_.Now()));
   ProcessReceivedPacket(kSelfAddress, kPeerAddress, *received);
 
+  EXPECT_FALSE(connection_.IsCurrentPacketConnectivityProbing());
   EXPECT_EQ(kPeerAddress, connection_.peer_address());
   if (GetQuicReloadableFlag(quic_enable_server_proxy)) {
     EXPECT_EQ(kPeerAddress, connection_.effective_peer_address());
@@ -1769,6 +1785,7 @@ TEST_P(QuicConnectionTest, ReceiveConnectivityProbingAtClient) {
       clock_.Now()));
   ProcessReceivedPacket(kNewSelfAddress, kPeerAddress, *received);
 
+  EXPECT_TRUE(connection_.IsCurrentPacketConnectivityProbing());
   EXPECT_EQ(kPeerAddress, connection_.peer_address());
   if (GetQuicReloadableFlag(quic_enable_server_proxy)) {
     EXPECT_EQ(kPeerAddress, connection_.effective_peer_address());
@@ -3228,11 +3245,13 @@ TEST_P(QuicConnectionTest, RetransmitWithSameEncryptionLevel) {
 
   // A TaggingEncrypter puts kTagSize copies of the given byte (0x01 here) at
   // the end of the packet. We can test this to check which encrypter was used.
-  connection_.SetEncrypter(ENCRYPTION_NONE, new TaggingEncrypter(0x01));
+  connection_.SetEncrypter(ENCRYPTION_NONE,
+                           QuicMakeUnique<TaggingEncrypter>(0x01));
   SendStreamDataToPeer(kCryptoStreamId, "foo", 0, NO_FIN, nullptr);
   EXPECT_EQ(0x01010101u, writer_->final_bytes_of_last_packet());
 
-  connection_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(0x02));
+  connection_.SetEncrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<TaggingEncrypter>(0x02));
   connection_.SetDefaultEncryptionLevel(ENCRYPTION_INITIAL);
   SendStreamDataToPeer(3, "foo", 0, NO_FIN, nullptr);
   EXPECT_EQ(0x02020202u, writer_->final_bytes_of_last_packet());
@@ -3257,7 +3276,8 @@ TEST_P(QuicConnectionTest, SendHandshakeMessages) {
   use_tagging_decrypter();
   // A TaggingEncrypter puts kTagSize copies of the given byte (0x01 here) at
   // the end of the packet. We can test this to check which encrypter was used.
-  connection_.SetEncrypter(ENCRYPTION_NONE, new TaggingEncrypter(0x01));
+  connection_.SetEncrypter(ENCRYPTION_NONE,
+                           QuicMakeUnique<TaggingEncrypter>(0x01));
 
   // Attempt to send a handshake message and have the socket block.
   EXPECT_CALL(*send_algorithm_, CanSend(_)).WillRepeatedly(Return(true));
@@ -3267,7 +3287,8 @@ TEST_P(QuicConnectionTest, SendHandshakeMessages) {
   EXPECT_EQ(1u, connection_.NumQueuedPackets());
 
   // Switch to the new encrypter.
-  connection_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(0x02));
+  connection_.SetEncrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<TaggingEncrypter>(0x02));
   connection_.SetDefaultEncryptionLevel(ENCRYPTION_INITIAL);
 
   // Now become writeable and flush the packets.
@@ -3283,7 +3304,8 @@ TEST_P(QuicConnectionTest, SendHandshakeMessages) {
 TEST_P(QuicConnectionTest,
        DropRetransmitsForNullEncryptedPacketAfterForwardSecure) {
   use_tagging_decrypter();
-  connection_.SetEncrypter(ENCRYPTION_NONE, new TaggingEncrypter(0x01));
+  connection_.SetEncrypter(ENCRYPTION_NONE,
+                           QuicMakeUnique<TaggingEncrypter>(0x01));
   QuicPacketNumber packet_number;
   SendStreamDataToPeer(kCryptoStreamId, "foo", 0, NO_FIN, &packet_number);
 
@@ -3294,7 +3316,7 @@ TEST_P(QuicConnectionTest,
 
   // Go forward secure.
   connection_.SetEncrypter(ENCRYPTION_FORWARD_SECURE,
-                           new TaggingEncrypter(0x02));
+                           QuicMakeUnique<TaggingEncrypter>(0x02));
   connection_.SetDefaultEncryptionLevel(ENCRYPTION_FORWARD_SECURE);
   notifier_.NeuterUnencryptedData();
   connection_.NeuterUnencryptedPackets();
@@ -3308,12 +3330,14 @@ TEST_P(QuicConnectionTest,
 
 TEST_P(QuicConnectionTest, RetransmitPacketsWithInitialEncryption) {
   use_tagging_decrypter();
-  connection_.SetEncrypter(ENCRYPTION_NONE, new TaggingEncrypter(0x01));
+  connection_.SetEncrypter(ENCRYPTION_NONE,
+                           QuicMakeUnique<TaggingEncrypter>(0x01));
   connection_.SetDefaultEncryptionLevel(ENCRYPTION_NONE);
 
   SendStreamDataToPeer(1, "foo", 0, NO_FIN, nullptr);
 
-  connection_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(0x02));
+  connection_.SetEncrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<TaggingEncrypter>(0x02));
   connection_.SetDefaultEncryptionLevel(ENCRYPTION_INITIAL);
 
   SendStreamDataToPeer(2, "bar", 0, NO_FIN, nullptr);
@@ -3331,7 +3355,8 @@ TEST_P(QuicConnectionTest, BufferNonDecryptablePackets) {
   use_tagging_decrypter();
 
   const uint8_t tag = 0x07;
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
 
   // Process an encrypted packet which can not yet be decrypted which should
   // result in the packet being buffered.
@@ -3339,9 +3364,11 @@ TEST_P(QuicConnectionTest, BufferNonDecryptablePackets) {
 
   // Transition to the new encryption state and process another encrypted packet
   // which should result in the original packet being processed.
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
   connection_.SetDefaultEncryptionLevel(ENCRYPTION_INITIAL);
-  connection_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetEncrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<TaggingEncrypter>(tag));
   EXPECT_CALL(visitor_, OnStreamFrame(_)).Times(2);
   ProcessDataPacketAtLevel(2, !kHasStopWaiting, ENCRYPTION_INITIAL);
 
@@ -3361,7 +3388,8 @@ TEST_P(QuicConnectionTest, Buffer100NonDecryptablePackets) {
   use_tagging_decrypter();
 
   const uint8_t tag = 0x07;
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
 
   // Process an encrypted packet which can not yet be decrypted which should
   // result in the packet being buffered.
@@ -3371,9 +3399,11 @@ TEST_P(QuicConnectionTest, Buffer100NonDecryptablePackets) {
 
   // Transition to the new encryption state and process another encrypted packet
   // which should result in the original packets being processed.
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
   connection_.SetDefaultEncryptionLevel(ENCRYPTION_INITIAL);
-  connection_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetEncrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<TaggingEncrypter>(tag));
   EXPECT_CALL(visitor_, OnStreamFrame(_)).Times(101);
   ProcessDataPacketAtLevel(101, !kHasStopWaiting, ENCRYPTION_INITIAL);
 
@@ -4515,8 +4545,10 @@ TEST_P(QuicConnectionTest, SendDelayedAck) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -4557,8 +4589,10 @@ TEST_P(QuicConnectionTest, SendDelayedAckDecimation) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -4620,8 +4654,10 @@ TEST_P(QuicConnectionTest, SendDelayedAckDecimationUnlimitedAggregation) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -4671,8 +4707,10 @@ TEST_P(QuicConnectionTest, SendDelayedAckDecimationEighthRtt) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -4728,8 +4766,10 @@ TEST_P(QuicConnectionTest, SendDelayedAckDecimationWithReordering) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -4793,8 +4833,10 @@ TEST_P(QuicConnectionTest, SendDelayedAckDecimationWithLargeReordering) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -4876,8 +4918,10 @@ TEST_P(QuicConnectionTest, SendDelayedAckDecimationWithReorderingEighthRtt) {
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -4943,8 +4987,10 @@ TEST_P(QuicConnectionTest,
   EXPECT_CALL(visitor_, OnSuccessfulVersionNegotiation(_));
   EXPECT_FALSE(connection_.GetAckAlarm()->IsSet());
   const uint8_t tag = 0x07;
-  connection_.SetDecrypter(ENCRYPTION_INITIAL, new StrictTaggingDecrypter(tag));
-  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL, new TaggingEncrypter(tag));
+  connection_.SetDecrypter(ENCRYPTION_INITIAL,
+                           QuicMakeUnique<StrictTaggingDecrypter>(tag));
+  peer_framer_.SetEncrypter(ENCRYPTION_INITIAL,
+                            QuicMakeUnique<TaggingEncrypter>(tag));
   // Process a packet from the non-crypto stream.
   frame1_.stream_id = 3;
 
@@ -6113,10 +6159,10 @@ TEST_P(QuicConnectionTest, SendDataWhenApplicationLimited) {
     EXPECT_CALL(visitor_, WillingAndAbleToWrite())
         .WillRepeatedly(Return(false));
   }
-  // Fix congestion window to be 2000 bytes.
-  EXPECT_CALL(*send_algorithm_, CanSend(Ge(2000u)))
+  // Fix congestion window to be 20,000 bytes.
+  EXPECT_CALL(*send_algorithm_, CanSend(Ge(20000u)))
       .WillRepeatedly(Return(false));
-  EXPECT_CALL(*send_algorithm_, CanSend(Lt(2000u)))
+  EXPECT_CALL(*send_algorithm_, CanSend(Lt(20000u)))
       .WillRepeatedly(Return(true));
 
   EXPECT_CALL(*send_algorithm_, OnApplicationLimited(_)).Times(0);
@@ -6125,9 +6171,12 @@ TEST_P(QuicConnectionTest, SendDataWhenApplicationLimited) {
   connection_.OnHandshakeComplete();
   connection_.SendStreamData3();
 
-  // Since the frame data we send is small, we expect a lot of packets from a
-  // 2000 byte window.
+  // We expect a lot of packets from a 20 kbyte window.
   EXPECT_GT(connection_.GetStats().packets_sent, 10u);
+  // Ensure that the packets are padded.
+  QuicByteCount average_packet_size =
+      connection_.GetStats().bytes_sent / connection_.GetStats().packets_sent;
+  EXPECT_GT(average_packet_size, 1000u);
 
   // Acknowledge all packets sent, except for the last one.
   QuicAckFrame ack = InitAckFrame(
@@ -6429,6 +6478,24 @@ TEST_P(QuicConnectionTest, OnForwardProgressConfirmed) {
   EXPECT_CALL(visitor_, OnForwardProgressConfirmed());
   frame = InitAckFrame({{2, 3}});
   ProcessAckPacket(&frame);
+}
+
+TEST_P(QuicConnectionTest, ValidStatelessResetToken) {
+  const absl::uint128 kTestToken = 1010101;
+  const absl::uint128 kWrongTestToken = 1010100;
+  QuicConfig config;
+  // No token has been received.
+  EXPECT_FALSE(connection_.IsValidStatelessResetToken(kTestToken));
+
+  EXPECT_CALL(*send_algorithm_, SetFromConfig(_, _)).Times(2);
+  // Token is different from received token.
+  QuicConfigPeer::SetReceivedStatelessResetToken(&config, kTestToken);
+  connection_.SetFromConfig(config);
+  EXPECT_FALSE(connection_.IsValidStatelessResetToken(kWrongTestToken));
+
+  QuicConfigPeer::SetReceivedStatelessResetToken(&config, kTestToken);
+  connection_.SetFromConfig(config);
+  EXPECT_TRUE(connection_.IsValidStatelessResetToken(kTestToken));
 }
 
 }  // namespace

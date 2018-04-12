@@ -219,6 +219,9 @@ const uint64_t kMaxIetfVarInt = UINT64_C(0x3fffffffffffffff);
 // The maximum stream id value that is supported - (2^32)-1
 const QuicStreamId kMaxQuicStreamId = 0xffffffff;
 
+// Number of bytes reserved for packet header type.
+const size_t kPacketHeaderTypeSize = 1;
+
 }  // namespace gfe_quic
 
 #endif  // GFE_QUIC_CORE_QUIC_CONSTANTS_H_

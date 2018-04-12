@@ -11,7 +11,7 @@ import subprocess
 import sys
 import tempfile
 
-DEPOT_BASE_DIR = '/google/src/cloud/wangyix/cronetspeedtest_scripts/google3'
+DEPOT_BASE_DIR = '/google/src/cloud/ckrasic/quic-dev/google3/'
 DEPOT_SPEEDTEST_DIR = os.path.join(DEPOT_BASE_DIR,
                                    'gfe/quic/tools/cronetspeedtest')
 DEPOT_RUN_BENCHMARKS_PY_DIR = os.path.join(DEPOT_BASE_DIR,
@@ -21,6 +21,9 @@ DEPOT_GFE2_CONFIG_PATH = os.path.join(DEPOT_SPEEDTEST_DIR,
                                       'gfe2_configs/gfe2_config.txt')
 DEPOT_SCRIPTS_DIR = os.path.join(DEPOT_SPEEDTEST_DIR, 'bin')
 
+FASTER_STATS_PORT_NUM = 6441
+HTTP_PORT_NUM = 8888
+HTTPS_PORT_NUM = 8443
 PORT_NUM = 8443
 NUM_GFES = 4
 
@@ -107,7 +110,9 @@ def main():
   mkdir(configs_dir)
   for i in range(0, NUM_GFES):
     replacement_dict = {
-        'PORT_PLACEHOLDER': str(PORT_NUM + i),
+        'HTTPS_PORT_PLACEHOLDER': str(HTTPS_PORT_NUM + i),
+        'HTTP_PORT_PLACEHOLDER': str(HTTP_PORT_NUM + i),
+        'FASTER_STATS_PORT_PLACEHOLDER': str(FASTER_STATS_PORT_NUM + i),
         'CERTS_DIR_PLACEHOLDER': certs_dir,
         'HOSTNAME_PLACEHOLDER': hostname
     }

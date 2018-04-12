@@ -425,6 +425,8 @@ class QUIC_EXPORT_PRIVATE QuicConfig {
                                  HelloType hello_type,
                                  QuicString* error_details);
 
+  bool do_not_use_mspc() { return do_not_use_mspc_; }
+
  private:
   friend class test::QuicConfigPeer;
 
@@ -448,8 +450,10 @@ class QUIC_EXPORT_PRIVATE QuicConfig {
   QuicNegotiableUint32 idle_network_timeout_seconds_;
   // Whether to use silent close.  Defaults to 0 (false) and is otherwise true.
   QuicNegotiableUint32 silent_close_;
+  // Latched value of gfe2_reloadable_flag_quic_no_mspc.
+  const bool do_not_use_mspc_;
   // Maximum number of streams that the connection can support.
-  // TODO: Remove when removing QUIC_VERSION_34
+  // TODO: Remove when removing gfe2_reloadable_flag_quic_no_mspc.
   QuicNegotiableUint32 max_streams_per_connection_;
   // Maximum number of incoming dynamic streams that the connection can support.
   QuicFixedUint32 max_incoming_dynamic_streams_;
@@ -462,10 +466,6 @@ class QUIC_EXPORT_PRIVATE QuicConfig {
   QuicFixedUint32 initial_stream_flow_control_window_bytes_;
   // Initial session flow control receive window in bytes.
   QuicFixedUint32 initial_session_flow_control_window_bytes_;
-
-  // Socket receive buffer in bytes.
-  // TODO: Deprecate once QUIC_VERSION_34 is deprecated.
-  QuicFixedUint32 socket_receive_buffer_;
 
   // Whether tell peer not to attempt connection migration.
   QuicFixedUint32 connection_migration_disabled_;

@@ -15,7 +15,7 @@
 #ifndef GFE_QUIC_PLATFORM_API_QUIC_TEST_LOOPBACK_H_
 #define GFE_QUIC_PLATFORM_API_QUIC_TEST_LOOPBACK_H_
 
-#include "common/quic/platform/impl/quic_test_loopback_impl.h"
+#include "test/common/quic/platform/impl/quic_test_loopback_impl.h"
 
 namespace gfe_quic {
 

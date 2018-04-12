@@ -47,6 +47,8 @@ namespace {
 const QuicPacketNumber kEpoch = UINT64_C(1) << 32;
 const QuicPacketNumber kMask = kEpoch - 1;
 
+const absl::uint128 kTestStatelessResetToken = 1010101;  // 0x0F69B5
+
 // Use fields in which each byte is distinct to ensure that every byte is
 // framed correctly. The values are otherwise arbitrary.
 const QuicConnectionId kConnectionId = UINT64_C(0xFEDCBA9876543210);
@@ -270,6 +272,16 @@ class TestQuicVisitor : public QuicFramerVisitorInterface {
     return true;
   }
 
+  bool IsValidStatelessResetToken(absl::uint128 token) const override {
+    return token == kTestStatelessResetToken;
+  }
+
+  void OnAuthenticatedIetfStatelessResetPacket(
+      const QuicIetfStatelessResetPacket& packet) override {
+    stateless_reset_packet_ =
+        QuicMakeUnique<QuicIetfStatelessResetPacket>(packet);
+  }
+
   // Counters from the visitor_ callbacks.
   int error_count_;
   int version_mismatch_;
@@ -281,6 +293,7 @@ class TestQuicVisitor : public QuicFramerVisitorInterface {
 
   std::unique_ptr<QuicPacketHeader> header_;
   std::unique_ptr<QuicPublicResetPacket> public_reset_packet_;
+  std::unique_ptr<QuicIetfStatelessResetPacket> stateless_reset_packet_;
   std::unique_ptr<QuicVersionNegotiationPacket> version_negotiation_packet_;
   std::vector<std::unique_ptr<QuicStreamFrame>> stream_frames_;
   std::vector<std::unique_ptr<QuicAckFrame>> ack_frames_;
@@ -322,8 +335,11 @@ class QuicFramerTest : public QuicTestWithParam<ParsedQuicVersion> {
                 Perspective::IS_SERVER) {
     SetQuicFlag(&FLAGS_quic_supports_tls_handshake, true);
     framer_.set_version(version_);
-    framer_.SetDecrypter(ENCRYPTION_NONE, decrypter_);
-    framer_.SetEncrypter(ENCRYPTION_NONE, encrypter_);
+    framer_.SetDecrypter(ENCRYPTION_NONE,
+                         std::unique_ptr<QuicDecrypter>(decrypter_));
+    framer_.SetEncrypter(ENCRYPTION_NONE,
+                         std::unique_ptr<QuicEncrypter>(encrypter_));
+
     framer_.set_visitor(&visitor_);
   }
 
@@ -1347,9 +1363,11 @@ TEST_P(QuicFramerTest, StreamFrame) {
 TEST_P(QuicFramerTest, MissingDiversificationNonce) {
   QuicFramerPeer::SetPerspective(&framer_, Perspective::IS_CLIENT);
   framer_.SetDecrypter(ENCRYPTION_NONE,
-                       new NullDecrypter(Perspective::IS_CLIENT));
+                       QuicMakeUnique<NullDecrypter>(Perspective::IS_CLIENT));
   decrypter_ = new test::TestDecrypter();
-  framer_.SetAlternativeDecrypter(ENCRYPTION_INITIAL, decrypter_, false);
+  framer_.SetAlternativeDecrypter(ENCRYPTION_INITIAL,
+                                  std::unique_ptr<QuicDecrypter>(decrypter_),
+                                  false);
 
   // clang-format off
   unsigned char packet[] = {
@@ -4000,15 +4018,30 @@ TEST_P(QuicFramerTest, BuildVersionNegotiationPacket) {
       // version tag
       QUIC_VERSION_BYTES,
   };
+  unsigned char packet99[] = {
+      // type (long header)
+      0x80,
+      // connection_id
+      0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,
+      // version tag
+      0x00, 0x00, 0x00, 0x00,
+      // version tag
+      QUIC_VERSION_BYTES,
+  };
   // clang-format on
-
+  unsigned char* p = packet;
+  size_t p_size = QUIC_ARRAYSIZE(packet);
+  if (framer_.transport_version() == QUIC_VERSION_99) {
+    p = packet99;
+    p_size = QUIC_ARRAYSIZE(packet99);
+  }
   QuicConnectionId connection_id = kConnectionId;
   std::unique_ptr<QuicEncryptedPacket> data(
-      framer_.BuildVersionNegotiationPacket(connection_id, false,
-                                            SupportedVersions(GetParam())));
+      framer_.BuildVersionNegotiationPacket(
+          connection_id, framer_.transport_version() == QUIC_VERSION_99,
+          SupportedVersions(GetParam())));
   test::CompareCharArraysWithHexError("constructed packet", data->data(),
-                                      data->length(), AsChars(packet),
-                                      QUIC_ARRAYSIZE(packet));
+                                      data->length(), AsChars(p), p_size);
 }
 
 TEST_P(QuicFramerTest, BuildAckFramePacketOneAckBlock) {
@@ -5542,6 +5575,27 @@ TEST_P(QuicFramerTest, BuildPublicResetPacketWithClientAddress) {
                                       QUIC_ARRAYSIZE(packet));
 }
 
+TEST_P(QuicFramerTest, BuildIetfStatelessResetPacket) {
+  // clang-format off
+  unsigned char packet[] = {
+    // type (short header, 1 byte packet number)
+    0x00,
+    // connection_id
+    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,
+    // stateless reset token
+    0xB5, 0x69, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  };
+  // clang-format on
+  std::unique_ptr<QuicEncryptedPacket> data(
+      framer_.BuildIetfStatelessResetPacket(kConnectionId,
+                                            kTestStatelessResetToken));
+  ASSERT_TRUE(data != nullptr);
+  test::CompareCharArraysWithHexError("constructed packet", data->data(),
+                                      data->length(), AsChars(packet),
+                                      arraysize(packet));
+}
+
 TEST_P(QuicFramerTest, EncryptPacket) {
   QuicPacketNumber packet_number = kPacketNumber;
   // clang-format off
@@ -5895,9 +5949,9 @@ TEST_P(QuicFramerTest, ConstructEncryptedPacket) {
   // Since we are using ConstructEncryptedPacket, we have to set the framer's
   // crypto to be Null.
   framer_.SetDecrypter(ENCRYPTION_NONE,
-                       new NullDecrypter(framer_.perspective()));
+                       QuicMakeUnique<NullDecrypter>(framer_.perspective()));
   framer_.SetEncrypter(ENCRYPTION_NONE,
-                       new NullEncrypter(framer_.perspective()));
+                       QuicMakeUnique<NullEncrypter>(framer_.perspective()));
   ParsedQuicVersionVector versions;
   versions.push_back(framer_.version());
   std::unique_ptr<QuicEncryptedPacket> packet(ConstructEncryptedPacket(
@@ -5931,9 +5985,9 @@ TEST_P(QuicFramerTest, ConstructMisFramedEncryptedPacket) {
   // Since we are using ConstructEncryptedPacket, we have to set the framer's
   // crypto to be Null.
   framer_.SetDecrypter(ENCRYPTION_NONE,
-                       new NullDecrypter(framer_.perspective()));
+                       QuicMakeUnique<NullDecrypter>(framer_.perspective()));
   framer_.SetEncrypter(ENCRYPTION_NONE,
-                       new NullEncrypter(framer_.perspective()));
+                       QuicMakeUnique<NullEncrypter>(framer_.perspective()));
   ParsedQuicVersionVector versions;
   versions.push_back(framer_.version());
   std::unique_ptr<QuicEncryptedPacket> packet(ConstructMisFramedEncryptedPacket(

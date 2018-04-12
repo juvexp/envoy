@@ -24,18 +24,19 @@
 #include "common/quic/core/crypto/null_decrypter.h"
 #include "common/quic/platform/api/quic_bug_tracker.h"
 #include "common/quic/platform/api/quic_logging.h"
+#include "common/quic/platform/api/quic_ptr_util.h"
 #include "common/quic/platform/api/quic_string.h"
 #include "third_party/openssl/tls1.h"
 
 namespace gfe_quic {
 
 // static
-QuicDecrypter* QuicDecrypter::Create(QuicTag algorithm) {
+std::unique_ptr<QuicDecrypter> QuicDecrypter::Create(QuicTag algorithm) {
   switch (algorithm) {
     case kAESG:
-      return new Aes128Gcm12Decrypter();
+      return QuicMakeUnique<Aes128Gcm12Decrypter>();
     case kCC20:
-      return new ChaCha20Poly1305Decrypter();
+      return QuicMakeUnique<ChaCha20Poly1305Decrypter>();
     default:
       QUIC_LOG(FATAL) << "Unsupported algorithm: " << algorithm;
       return nullptr;
@@ -43,23 +44,19 @@ QuicDecrypter* QuicDecrypter::Create(QuicTag algorithm) {
 }
 
 // static
-QuicDecrypter* QuicDecrypter::CreateFromCipherSuite(uint32_t cipher_suite) {
-  QuicDecrypter* decrypter;
+std::unique_ptr<QuicDecrypter> QuicDecrypter::CreateFromCipherSuite(
+    uint32_t cipher_suite) {
   switch (cipher_suite) {
     case TLS1_CK_AES_128_GCM_SHA256:
-      decrypter = new Aes128GcmDecrypter();
-      break;
+      return QuicMakeUnique<Aes128GcmDecrypter>();
     case TLS1_CK_AES_256_GCM_SHA384:
-      decrypter = new Aes256GcmDecrypter();
-      break;
+      return QuicMakeUnique<Aes256GcmDecrypter>();
     case TLS1_CK_CHACHA20_POLY1305_SHA256:
-      decrypter = new ChaCha20Poly1305TlsDecrypter();
-      break;
+      return QuicMakeUnique<ChaCha20Poly1305TlsDecrypter>();
     default:
       QUIC_BUG << "TLS cipher suite is unknown to QUIC";
       return nullptr;
   }
-  return decrypter;
 }
 
 // static

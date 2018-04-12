@@ -18,7 +18,7 @@ gfe2_proto <
     idle_session_memory_threshold: 0.8
   >
   faster_stats_proto <
-    faster_server_port: 6441
+    faster_server_port: FASTER_STATS_PORT_PLACEHOLDER
   >
 >
 acceptor_proto <
@@ -27,17 +27,17 @@ acceptor_proto <
   listen_list <
     addresses: "::"
     accept_type: 1
-    port: 8888
+    port: HTTP_PORT_PLACEHOLDER
     sessiontype: "http"
   >
   listen_list <
-    port: PORT_PLACEHOLDER
+    port: HTTPS_PORT_PLACEHOLDER
     addresses: "::"
     accept_type: 1
     sessiontype: "https"
   >
   listen_list <
-    port: PORT_PLACEHOLDER
+    port: HTTPS_PORT_PLACEHOLDER
     addresses: "::"
     accept_type: 1
     protocol: 1

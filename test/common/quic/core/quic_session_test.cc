@@ -84,6 +84,10 @@ class TestCryptoStream : public QuicCryptoStream, public QuicCryptoHandshaker {
   }
 
   // QuicCryptoStream implementation
+  QuicLongHeaderType GetLongHeaderType(
+      QuicStreamOffset /*offset*/) const override {
+    return HANDSHAKE;
+  }
   bool encryption_established() const override {
     return encryption_established_;
   }
@@ -143,7 +147,7 @@ class TestSession : public QuicSession {
     Initialize();
     this->connection()->SetEncrypter(
         ENCRYPTION_FORWARD_SECURE,
-        new NullEncrypter(connection->perspective()));
+        QuicMakeUnique<NullEncrypter>(connection->perspective()));
   }
 
   ~TestSession() override { delete connection(); }

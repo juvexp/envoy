@@ -11,4 +11,4 @@ adb shell cmd package compile -f -m speed gfe.quic.tools.cronetspeedtest.android
 # Copy apk to SPEEDTEST_DIR for use by simpleperf
 mkdir -p "$SPEEDTEST_DIR/apk/"
 rm -f "$SPEEDTEST_DIR/apk/cronetspeedtest.apk"
-cp "blaze-bin/gfe/quic/tools/cronetspeedtest/android/cronetspeedtest.apk $SPEEDTEST_DIR/apk/"
+cp "blaze-bin/gfe/quic/tools/cronetspeedtest/android/cronetspeedtest.apk" "$SPEEDTEST_DIR/apk/"

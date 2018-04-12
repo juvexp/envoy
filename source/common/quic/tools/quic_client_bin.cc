@@ -198,12 +198,13 @@ int main(int argc, char* argv[]) {
   }
   if (!client.Connect()) {
     gfe_quic::QuicErrorCode error = client.session()->error();
-    if (FLAGS_version_mismatch_ok && error == gfe_quic::QUIC_INVALID_VERSION) {
+    if (error == gfe_quic::QUIC_INVALID_VERSION) {
       cout << "Server talks QUIC, but none of the versions supported by "
            << "this client: " << ParsedQuicVersionVectorToString(versions)
            << endl;
-      // Version mismatch is not deemed a failure.
-      return 0;
+      // 0: No error.
+      // 20: Failed to connect due to QUIC_INVALID_VERSION.
+      return FLAGS_version_mismatch_ok ? 0 : 20;
     }
     cerr << "Failed to connect to " << host_port
          << ". Error: " << gfe_quic::QuicErrorCodeToString(error) << endl;

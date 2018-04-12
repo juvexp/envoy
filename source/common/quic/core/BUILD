@@ -451,6 +451,7 @@ envoy_cc_library(
         "//base",
         "//source/common/quic/core/frames:quic_frames_lib",
         "//source/common/quic/platform/api:quic_export_lib",
+        "//source/common/quic/platform/api:quic_flag_utils_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//source/common/quic/platform/api:quic_map_util_lib",
         "//source/common/quic/platform/api:quic_ptr_util_lib",

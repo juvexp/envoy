@@ -72,6 +72,7 @@
 #include "common/quic/tools/quic_simple_server_stream.h"
 #include "net/util/netutil.h"
 #include "testing/base/public/test_utils.h"
+#include "third_party/absl/time/time.h"
 #include "util/time/clock.h"
 
 namespace gfe_quic {
@@ -589,6 +590,7 @@ class EndToEndTestWithTls : public EndToEndTest {
  protected:
   EndToEndTestWithTls() : EndToEndTest() {
     FLAGS_gfe2_reloadable_flag_delay_quic_server_handshaker_construction = true;
+    SetQuicReloadableFlag(quic_server_early_version_negotiation, true);
   }
 };
 
@@ -1611,6 +1613,26 @@ TEST_P(EndToEndTest, ConnectionMigrationClientPortChanged) {
   EXPECT_NE(old_address.port(), new_address.port());
 }
 
+TEST_P(EndToEndTest, NegotiatedInitialCongestionWindow) {
+  SetQuicReloadableFlag(quic_unified_iw_options, true);
+  client_extra_copts_.push_back(kIW03);
+
+  ASSERT_TRUE(Initialize());
+
+  // Values are exchanged during crypto handshake, so wait for that to finish.
+  EXPECT_TRUE(client_->client()->WaitForCryptoHandshakeConfirmed());
+  server_thread_->WaitForCryptoHandshakeConfirmed();
+  server_thread_->Pause();
+
+  QuicDispatcher* dispatcher =
+      QuicServerPeer::GetDispatcher(server_thread_->server());
+  QuicSession* session = dispatcher->session_map().begin()->second.get();
+  QuicConnection* server_connection = session->connection();
+  QuicPacketCount cwnd =
+      server_connection->sent_packet_manager().initial_congestion_window();
+  EXPECT_EQ(3, cwnd);
+}
+
 TEST_P(EndToEndTest, DifferentFlowControlWindows) {
   // Client and server can set different initial flow control receive windows.
   // These are sent in CHLO/SHLO. Tests that these values are exchanged properly
@@ -2086,7 +2108,7 @@ TEST_P(EndToEndTestWithTls, BadPacketHeaderTruncated) {
       client_->client()->network_helper()->GetLatestClientAddress().host(),
       server_address_, nullptr);
   // Give the server time to process the packet.
-  util::Clock::RealClock()->Sleep(base::Milliseconds(100));
+  util::Clock::RealClock()->Sleep(absl::Milliseconds(100));
   // Pause the server so we can access the server's internals without races.
   server_thread_->Pause();
   QuicDispatcher* dispatcher =
@@ -2137,7 +2159,7 @@ TEST_P(EndToEndTestWithTls, BadPacketHeaderFlags) {
       client_->client()->network_helper()->GetLatestClientAddress().host(),
       server_address_, nullptr);
   // Give the server time to process the packet.
-  util::Clock::RealClock()->Sleep(base::Milliseconds(100));
+  util::Clock::RealClock()->Sleep(absl::Milliseconds(100));
   // Pause the server so we can access the server's internals without races.
   server_thread_->Pause();
   QuicDispatcher* dispatcher =
@@ -2173,7 +2195,7 @@ TEST_P(EndToEndTestWithTls, BadEncryptedData) {
       client_->client()->network_helper()->GetLatestClientAddress().host(),
       server_address_, nullptr);
   // Give the server time to process the packet.
-  util::Clock::RealClock()->Sleep(base::Milliseconds(100));
+  util::Clock::RealClock()->Sleep(absl::Milliseconds(100));
   // This error is sent to the connection's OnError (which ignores it), so the
   // dispatcher doesn't see it.
   // Pause the server so we can access the server's internals without races.

@@ -308,6 +308,7 @@ envoy_cc_library(
         "//source/common/quic/platform/api:quic_flag_utils_lib",
         "//source/common/quic/platform/api:quic_flags_lib",
         "//source/common/quic/platform/api:quic_logging_lib",
+        "//source/common/quic/platform/api:quic_ptr_util_lib",
         "//source/common/quic/platform/api:quic_string_lib",
         "//source/common/quic/platform/api:quic_string_piece_lib",
         "//source/common/quic/platform/api:quic_uint128_lib",

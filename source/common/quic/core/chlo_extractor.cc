@@ -63,6 +63,9 @@ class ChloFramerVisitor : public QuicFramerVisitorInterface,
   bool OnBlockedFrame(const QuicBlockedFrame& frame) override;
   bool OnPaddingFrame(const QuicPaddingFrame& frame) override;
   void OnPacketComplete() override {}
+  bool IsValidStatelessResetToken(absl::uint128 token) const override;
+  void OnAuthenticatedIetfStatelessResetPacket(
+      const QuicIetfStatelessResetPacket& packet) override {}
 
   // CryptoFramerVisitorInterface implementation.
   void OnError(CryptoFramer* framer) override;
@@ -187,6 +190,10 @@ bool ChloFramerVisitor::OnBlockedFrame(const QuicBlockedFrame& frame) {
 
 bool ChloFramerVisitor::OnPaddingFrame(const QuicPaddingFrame& frame) {
   return true;
+}
+
+bool ChloFramerVisitor::IsValidStatelessResetToken(absl::uint128 token) const {
+  return false;
 }
 
 void ChloFramerVisitor::OnError(CryptoFramer* framer) {}

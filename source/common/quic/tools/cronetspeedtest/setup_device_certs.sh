@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-CERTS_DIR=$CERTS_DIR_PLACEHOLDER
+CERTS_DIR=CERTS_DIR_PLACEHOLDER
 
 # First remount /system as read-write
 printf "Make sure Android device is connected via USB and USB debugging is enabled.\n"

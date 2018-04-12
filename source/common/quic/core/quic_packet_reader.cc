@@ -73,7 +73,7 @@ bool QuicPacketReader::ReadAndDispatchPackets(
     const QuicClock& clock,
     ProcessPacketInterface* processor,
     QuicPacketCount* packets_dropped) {
-#if MMSG_MORE
+#if MMSG_MORE && !defined(__ANDROID__)
   return ReadAndDispatchManyPackets(fd, port, clock, processor,
                                     packets_dropped);
 #else
@@ -88,7 +88,7 @@ bool QuicPacketReader::ReadAndDispatchManyPackets(
     const QuicClock& clock,
     ProcessPacketInterface* processor,
     QuicPacketCount* packets_dropped) {
-#if MMSG_MORE
+#if MMSG_MORE && !defined(__ANDROID__)
   // Re-set the length fields in case recvmmsg has changed them.
   for (int i = 0; i < kNumPacketsPerReadMmsgCall; ++i) {
     DCHECK_EQ(kMaxPacketSize, packets_[i].iov.iov_len);

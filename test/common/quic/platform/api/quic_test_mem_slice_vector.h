@@ -18,7 +18,7 @@
 #include <utility>
 
 #include "common/quic/platform/api/quic_mem_slice_span.h"
-#include "common/quic/platform/impl/quic_test_mem_slice_vector_impl.h"
+#include "test/common/quic/platform/impl/quic_test_mem_slice_vector_impl.h"
 
 namespace gfe_quic {
 namespace test {

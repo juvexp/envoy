@@ -96,7 +96,7 @@ public class SpeedTestActivity extends Activity {
 
   private static final long PROGRESS_THRESHOLD_MILLIS = 200;  // 0.2 second
   private static final int PORT = 8443;
-  private static final long UPLOAD_BYTES = 500 * 1000000; // 500 MBytes
+  private static final long UPLOAD_BYTES = 30L * 1024 * 1024 * 1024; // 30 GBytes
 
   @Nullable private String quicConnectionOptions;
   @Nullable private String quicClientConnectionOptions;

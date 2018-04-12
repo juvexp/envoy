@@ -92,7 +92,7 @@ static void HandleDownloadRequest(RequestReceivedResult* result) {
   header->set_value("text/plain");
   // Use composite payload since a single payload's |arbitrary_bytes| has an
   // upper limit. This results in chunked encoding.
-  const int NUM_PAYLOADS = 50;
+  const int NUM_PAYLOADS = 500;
   const int64_t SIZE_PER_PAYLOAD = 100LL * 1000000LL;  // 100 MB
   HttpResponseInfo_CompositePayload* composite_payload =
       response->mutable_payload()->mutable_composite_payload();

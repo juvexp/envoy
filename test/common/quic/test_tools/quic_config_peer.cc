@@ -20,13 +20,6 @@ namespace gfe_quic {
 namespace test {
 
 // static
-void QuicConfigPeer::SetReceivedSocketReceiveBuffer(
-    QuicConfig* config,
-    uint32_t receive_buffer_bytes) {
-  config->socket_receive_buffer_.SetReceivedValue(receive_buffer_bytes);
-}
-
-// static
 void QuicConfigPeer::SetReceivedInitialStreamFlowControlWindow(
     QuicConfig* config,
     uint32_t window_bytes) {
@@ -72,6 +65,12 @@ void QuicConfigPeer::SetReceivedMaxIncomingDynamicStreams(
 void QuicConfigPeer::SetConnectionOptionsToSend(QuicConfig* config,
                                                 const QuicTagVector& options) {
   config->SetConnectionOptionsToSend(options);
+}
+
+// static
+void QuicConfigPeer::SetReceivedStatelessResetToken(QuicConfig* config,
+                                                    absl::uint128 token) {
+  config->stateless_reset_token_.SetReceivedValue(token);
 }
 
 }  // namespace test

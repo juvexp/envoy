@@ -302,6 +302,7 @@ envoy_cc_test_library(
     deps = [
         ":mock_clock",
         ":mock_random",
+        ":quic_config_peer",
         ":quic_framer_peer",
         ":quic_packet_generator_peer",
         ":quic_sent_packet_manager_peer",

@@ -312,10 +312,12 @@ QuicConnection::QuicConnection(
       next_mtu_probe_at_(kPacketsBetweenMtuProbesBase),
       largest_received_packet_size_(0),
       write_error_occurred_(false),
-      no_stop_waiting_frames_(false),
+      no_stop_waiting_frames_(transport_version() > QUIC_VERSION_43),
       consecutive_num_packets_with_no_retransmittable_frames_(0),
       fill_up_link_during_probing_(false),
       probing_retransmission_pending_(false),
+      stateless_reset_token_received_(false),
+      received_stateless_reset_token_(0),
       last_control_frame_id_(kInvalidControlFrameId),
       negotiate_version_early_(
           GetQuicReloadableFlag(quic_server_early_version_negotiation)),
@@ -421,6 +423,10 @@ void QuicConnection::SetFromConfig(const QuicConfig& config) {
   if (transport_version() > QUIC_VERSION_37 &&
       config.HasClientSentConnectionOption(kNSTP, perspective_)) {
     no_stop_waiting_frames_ = true;
+  }
+  if (config.HasReceivedStatelessResetToken()) {
+    stateless_reset_token_received_ = true;
+    received_stateless_reset_token_ = config.ReceivedStatelessResetToken();
   }
 }
 
@@ -750,6 +756,7 @@ bool QuicConnection::OnPacketHeader(const QuicPacketHeader& header) {
 
   // Initialize the current packet content stats.
   current_packet_content_ = NO_FRAMES_RECEIVED;
+  is_current_packet_connectivity_probing_ = false;
 
   if (!enable_server_proxy_) {
     current_peer_migration_type_ = NO_CHANGE;
@@ -1276,6 +1283,20 @@ void QuicConnection::OnPacketComplete() {
   CloseIfTooManyOutstandingSentPackets();
 }
 
+bool QuicConnection::IsValidStatelessResetToken(absl::uint128 token) const {
+  return stateless_reset_token_received_ &&
+         token == received_stateless_reset_token_;
+}
+
+void QuicConnection::OnAuthenticatedIetfStatelessResetPacket(
+    const QuicIetfStatelessResetPacket& packet) {
+  // TODO: Add OnAuthenticatedIetfStatelessResetPacket to
+  // debug_visitor_.
+  const string error_details = "Received stateless reset.";
+  TearDownLocalConnectionState(QUIC_PUBLIC_RESET, error_details,
+                               ConnectionCloseSource::FROM_PEER);
+}
+
 void QuicConnection::MaybeQueueAck(bool was_missing) {
   ++num_packets_received_since_last_ack_sent_;
   // Always send an ack every 20 packets in order to allow the peer to discard
@@ -1646,14 +1667,26 @@ void QuicConnection::OnCanWrite() {
     visitor_->PostProcessAfterData();
   }
 
-  // After the visitor writes, it may have caused the socket to become write
-  // blocked or the congestion manager to prohibit sending, so check again.
-  if (visitor_->WillingAndAbleToWrite() && !resume_writes_alarm_->IsSet() &&
-      CanWrite(HAS_RETRANSMITTABLE_DATA)) {
-    // We're not write blocked, but some stream didn't write out all of its
-    // bytes. Register for 'immediate' resumption so we'll keep writing after
-    // other connections and events have had a chance to use the thread.
-    resume_writes_alarm_->Set(clock_->ApproximateNow());
+  if (GetQuicReloadableFlag(quic_unified_send_alarm)) {
+    // After the visitor writes, it may have caused the socket to become write
+    // blocked or the congestion manager to prohibit sending, so check again.
+    if (visitor_->WillingAndAbleToWrite() && !send_alarm_->IsSet() &&
+        CanWrite(HAS_RETRANSMITTABLE_DATA)) {
+      // We're not write blocked, but some stream didn't write out all of its
+      // bytes. Register for 'immediate' resumption so we'll keep writing after
+      // other connections and events have had a chance to use the thread.
+      send_alarm_->Set(clock_->ApproximateNow());
+    }
+  } else {
+    // After the visitor writes, it may have caused the socket to become write
+    // blocked or the congestion manager to prohibit sending, so check again.
+    if (visitor_->WillingAndAbleToWrite() && !resume_writes_alarm_->IsSet() &&
+        CanWrite(HAS_RETRANSMITTABLE_DATA)) {
+      // We're not write blocked, but some stream didn't write out all of its
+      // bytes. Register for 'immediate' resumption so we'll keep writing after
+      // other connections and events have had a chance to use the thread.
+      resume_writes_alarm_->Set(clock_->ApproximateNow());
+    }
   }
 }
 
@@ -1666,7 +1699,14 @@ void QuicConnection::WriteIfNotBlocked() {
 void QuicConnection::WriteAndBundleAcksIfNotBlocked() {
   if (!writer_->IsWriteBlocked()) {
     ScopedPacketFlusher flusher(this, SEND_ACK_IF_QUEUED);
-    OnCanWrite();
+    if (GetQuicReloadableFlag(quic_is_write_blocked)) {
+      // TODO: Merge OnCanWrite and WriteIfNotBlocked when deprecating
+      // this flag.
+      QUIC_FLAG_COUNT(gfe2_reloadable_flag_quic_is_write_blocked);
+      WriteIfNotBlocked();
+    } else {
+      OnCanWrite();
+    }
   }
 }
 
@@ -2316,8 +2356,8 @@ void QuicConnection::OnRetransmissionTimeout() {
 }
 
 void QuicConnection::SetEncrypter(EncryptionLevel level,
-                                  QuicEncrypter* encrypter) {
-  packet_generator_.SetEncrypter(level, encrypter);
+                                  std::unique_ptr<QuicEncrypter> encrypter) {
+  packet_generator_.SetEncrypter(level, std::move(encrypter));
 }
 
 void QuicConnection::SetDiversificationNonce(
@@ -2337,14 +2377,15 @@ void QuicConnection::SetDefaultEncryptionLevel(EncryptionLevel level) {
 }
 
 void QuicConnection::SetDecrypter(EncryptionLevel level,
-                                  QuicDecrypter* decrypter) {
-  framer_.SetDecrypter(level, decrypter);
+                                  std::unique_ptr<QuicDecrypter> decrypter) {
+  framer_.SetDecrypter(level, std::move(decrypter));
 }
 
-void QuicConnection::SetAlternativeDecrypter(EncryptionLevel level,
-                                             QuicDecrypter* decrypter,
-                                             bool latch_once_used) {
-  framer_.SetAlternativeDecrypter(level, decrypter, latch_once_used);
+void QuicConnection::SetAlternativeDecrypter(
+    EncryptionLevel level,
+    std::unique_ptr<QuicDecrypter> decrypter,
+    bool latch_once_used) {
+  framer_.SetAlternativeDecrypter(level, std::move(decrypter), latch_once_used);
 }
 
 const QuicDecrypter* QuicConnection::decrypter() const {
@@ -2932,7 +2973,8 @@ void QuicConnection::OnPeerMigrationValidated() {
   active_peer_migration_type_ = NO_CHANGE;
 }
 
-// TODO: Modify method to start migration whenever a new IP address is seen
+// TODO: Modify method to start migration whenever a new IP address
+// is seen
 // from a packet with sequence number > the one that triggered the previous
 // migration. This should happen even if a migration is underway, since the
 // most recent migration is the one that we should pay attention to.
@@ -3006,6 +3048,10 @@ void QuicConnection::OnConnectionMigration(AddressChangeType addr_change_type) {
 }
 
 bool QuicConnection::IsCurrentPacketConnectivityProbing() const {
+  if (enable_server_proxy_) {
+    return is_current_packet_connectivity_probing_;
+  }
+
   if (current_packet_content_ != SECOND_FRAME_IS_PADDING) {
     return false;
   }
@@ -3052,7 +3098,8 @@ bool QuicConnection::MaybeConsiderAsMemoryCorruption(
 void QuicConnection::MaybeSendProbingRetransmissions() {
   DCHECK(fill_up_link_during_probing_);
 
-  if (!sent_packet_manager_.handshake_confirmed()) {
+  if (!sent_packet_manager_.handshake_confirmed() ||
+      sent_packet_manager().HasUnackedCryptoPackets()) {
     return;
   }
 
@@ -3117,6 +3164,16 @@ void QuicConnection::UpdatePacketContent(PacketContent type) {
   if (type == SECOND_FRAME_IS_PADDING) {
     if (current_packet_content_ == FIRST_FRAME_IS_PING) {
       current_packet_content_ = SECOND_FRAME_IS_PADDING;
+      if (enable_server_proxy_) {
+        if (perspective_ == Perspective::IS_SERVER) {
+          is_current_packet_connectivity_probing_ =
+              current_effective_peer_migration_type_ != NO_CHANGE;
+        } else {
+          is_current_packet_connectivity_probing_ =
+              (last_packet_source_address_ != peer_address_) ||
+              (last_packet_destination_address_ != self_address_);
+        }
+      }
       return;
     }
   }
@@ -3207,6 +3264,10 @@ void QuicConnection::SetDataProducer(
 
 void QuicConnection::SetTransmissionType(TransmissionType type) {
   packet_generator_.SetTransmissionType(type);
+}
+
+void QuicConnection::SetLongHeaderType(QuicLongHeaderType type) {
+  packet_generator_.SetLongHeaderType(type);
 }
 
 bool QuicConnection::session_decides_what_to_write() const {

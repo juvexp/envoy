@@ -106,6 +106,17 @@ struct QUIC_EXPORT_PRIVATE QuicVersionNegotiationPacket {
   ParsedQuicVersionVector versions;
 };
 
+struct QUIC_EXPORT_PRIVATE QuicIetfStatelessResetPacket {
+  QuicIetfStatelessResetPacket();
+  QuicIetfStatelessResetPacket(const QuicPacketHeader& header,
+                               absl::uint128 token);
+  QuicIetfStatelessResetPacket(const QuicIetfStatelessResetPacket& other);
+  ~QuicIetfStatelessResetPacket();
+
+  QuicPacketHeader header;
+  absl::uint128 stateless_reset_token;
+};
+
 class QUIC_EXPORT_PRIVATE QuicData {
  public:
   QuicData(const char* buffer, size_t length);

@@ -20,6 +20,8 @@
 #include <memory>
 
 #include "base/macros.h"
+#include "common/quic/core/crypto/quic_decrypter.h"
+#include "common/quic/core/crypto/quic_encrypter.h"
 #include "common/quic/core/quic_packets.h"
 #include "common/quic/platform/api/quic_endian.h"
 #include "common/quic/platform/api/quic_export.h"
@@ -34,8 +36,6 @@ class QuicFramerPeer;
 
 class QuicDataReader;
 class QuicDataWriter;
-class QuicDecrypter;
-class QuicEncrypter;
 class QuicFramer;
 class QuicStreamFrameDataProducer;
 
@@ -159,6 +159,14 @@ class QUIC_EXPORT_PRIVATE QuicFramerVisitorInterface {
 
   // Called when a packet has been completely processed.
   virtual void OnPacketComplete() = 0;
+
+  // Called to check whether |token| is a valid stateless reset token.
+  virtual bool IsValidStatelessResetToken(absl::uint128 token) const = 0;
+
+  // Called when an IETF stateless reset packet has been parsed and validated
+  // with the stateless reset token.
+  virtual void OnAuthenticatedIetfStatelessResetPacket(
+      const QuicIetfStatelessResetPacket& packet) = 0;
 };
 
 // Class for parsing and constructing QUIC packets.  It has a
@@ -288,10 +296,20 @@ class QUIC_EXPORT_PRIVATE QuicFramer {
   static std::unique_ptr<QuicEncryptedPacket> BuildPublicResetPacket(
       const QuicPublicResetPacket& packet);
 
+  // Returns a new IETF stateless reset packet.
+  static std::unique_ptr<QuicEncryptedPacket> BuildIetfStatelessResetPacket(
+      QuicConnectionId connection_id,
+      uint128 stateless_reset_token);
+
   // Returns a new version negotiation packet.
   static std::unique_ptr<QuicEncryptedPacket> BuildVersionNegotiationPacket(
       QuicConnectionId connection_id,
       bool ietf_quic,
+      const ParsedQuicVersionVector& versions);
+
+  // Returns a new IETF version negotiation packet.
+  static std::unique_ptr<QuicEncryptedPacket> BuildIetfVersionNegotiationPacket(
+      QuicConnectionId connection_id,
       const ParsedQuicVersionVector& versions);
 
   // If header.version_flag is set, the version in the
@@ -306,29 +324,30 @@ class QUIC_EXPORT_PRIVATE QuicFramer {
                          bool last_frame_in_packet,
                          QuicDataWriter* writer);
 
-  // SetDecrypter sets the primary decrypter, replacing any that already exists,
-  // and takes ownership. If an alternative decrypter is in place then the
-  // function DCHECKs. This is intended for cases where one knows that future
-  // packets will be using the new decrypter and the previous decrypter is now
-  // obsolete. |level| indicates the encryption level of the new decrypter.
-  void SetDecrypter(EncryptionLevel level, QuicDecrypter* decrypter);
+  // SetDecrypter sets the primary decrypter, replacing any that already exists.
+  // If an alternative decrypter is in place then the function DCHECKs. This is
+  // intended for cases where one knows that future packets will be using the
+  // new decrypter and the previous decrypter is now obsolete. |level| indicates
+  // the encryption level of the new decrypter.
+  void SetDecrypter(EncryptionLevel level,
+                    std::unique_ptr<QuicDecrypter> decrypter);
 
   // SetAlternativeDecrypter sets a decrypter that may be used to decrypt
-  // future packets and takes ownership of it. |level| indicates the encryption
-  // level of the decrypter. If |latch_once_used| is true, then the first time
-  // that the decrypter is successful it will replace the primary decrypter.
-  // Otherwise both decrypters will remain active and the primary decrypter
-  // will be the one last used.
+  // future packets. |level| indicates the encryption level of the decrypter. If
+  // |latch_once_used| is true, then the first time that the decrypter is
+  // successful it will replace the primary decrypter.  Otherwise both
+  // decrypters will remain active and the primary decrypter will be the one
+  // last used.
   void SetAlternativeDecrypter(EncryptionLevel level,
-                               QuicDecrypter* decrypter,
+                               std::unique_ptr<QuicDecrypter> decrypter,
                                bool latch_once_used);
 
   const QuicDecrypter* decrypter() const;
   const QuicDecrypter* alternative_decrypter() const;
 
-  // Changes the encrypter used for level |level| to |encrypter|. The function
-  // takes ownership of |encrypter|.
-  void SetEncrypter(EncryptionLevel level, QuicEncrypter* encrypter);
+  // Changes the encrypter used for level |level| to |encrypter|.
+  void SetEncrypter(EncryptionLevel level,
+                    std::unique_ptr<QuicEncrypter> encrypter);
 
   // Encrypts a payload in |buffer|.  |ad_len| is the length of the associated
   // data. |total_len| is the length of the associated data plus plaintext.
